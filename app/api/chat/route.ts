@@ -25,7 +25,7 @@ const UPDATE_ITINERARY_TOOL: Anthropic.Messages.ToolUnion = {
 export async function POST(req: NextRequest) {
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY is not set on the server. Add it to .env.local and restart." },
+      { error: "ANTHROPIC_API_KEY is not set. Local dev: add it to .env.local. Cloudflare: add it as a secret under the Worker's Settings → Variables and Secrets." },
       { status: 500 },
     );
   }

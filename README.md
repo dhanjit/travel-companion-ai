@@ -28,6 +28,27 @@ Open http://localhost:3000.
 |---|---|
 | `ANTHROPIC_API_KEY` | Your Anthropic API key (get one at https://platform.claude.com) |
 
+## Hosting on Cloudflare Workers
+
+The app is set up for Cloudflare Workers via [OpenNext](https://opennext.js.org/cloudflare) (`wrangler.jsonc` + `open-next.config.ts`).
+
+**One-time setup with git integration (recommended):**
+
+1. Cloudflare dashboard → **Workers & Pages → Create → Import a repository** → pick this repo.
+2. Build command: `npx opennextjs-cloudflare build` · Deploy command: `npx opennextjs-cloudflare deploy`
+3. After the first deploy, open the Worker → **Settings → Variables and Secrets** → add secret `ANTHROPIC_API_KEY`.
+
+Every push to `main` then deploys automatically.
+
+**Or from a machine with wrangler auth:**
+
+```bash
+npm run deploy                                # build + deploy
+npx wrangler secret put ANTHROPIC_API_KEY     # once
+```
+
+Local preview in the Workers runtime: put the key in `.dev.vars`, then `npm run preview`.
+
 ## How it works
 
 - **`POST /api/plan`** — builds a system prompt from the traveler profiles and calls Claude (`claude-opus-4-8`, adaptive thinking) with a structured-output JSON schema, so the itinerary always matches the exact shape the UI renders.
