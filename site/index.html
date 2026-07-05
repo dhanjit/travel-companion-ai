@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Travel Companion AI — Demo</title>
 <style>
   :root {
@@ -5,8 +10,8 @@
     --card: #ffffff;
     --card-2: #f5f2ec;
     --ink: #1c1917;
-    --muted: #8a817a;
-    --faint: #b8afa6;
+    --muted: #6f675f;
+    --faint: #766e66;
     --line: #e7e2da;
     --accent: #c86a15;
     --accent-soft: #f7e8d8;
@@ -17,6 +22,7 @@
     --demo: #2f7d4f;
     --demo-soft: #e2f0e7;
     --shadow: 0 1px 3px rgba(28, 25, 23, 0.06);
+    color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -25,7 +31,7 @@
       --card-2: #2a2622;
       --ink: #e8e4df;
       --muted: #a39a91;
-      --faint: #6e665f;
+      --faint: #8d857c;
       --line: #383329;
       --accent: #f0a24b;
       --accent-soft: #3a2c1a;
@@ -39,15 +45,17 @@
     }
   }
   :root[data-theme="light"] {
+    color-scheme: light;
     --bg: #faf8f4; --card: #ffffff; --card-2: #f5f2ec; --ink: #1c1917;
-    --muted: #8a817a; --faint: #b8afa6; --line: #e7e2da;
+    --muted: #6f675f; --faint: #766e66; --line: #e7e2da;
     --accent: #c86a15; --accent-soft: #f7e8d8; --accent-ink: #ffffff;
     --bubble-user: #c86a15; --bubble-user-ink: #fff8f0; --bubble-ai: #f0ece5;
     --demo: #2f7d4f; --demo-soft: #e2f0e7; --shadow: 0 1px 3px rgba(28,25,23,0.06);
   }
   :root[data-theme="dark"] {
+    color-scheme: dark;
     --bg: #161412; --card: #211e1b; --card-2: #2a2622; --ink: #e8e4df;
-    --muted: #a39a91; --faint: #6e665f; --line: #383329;
+    --muted: #a39a91; --faint: #8d857c; --line: #383329;
     --accent: #f0a24b; --accent-soft: #3a2c1a; --accent-ink: #1c1409;
     --bubble-user: #b3661d; --bubble-user-ink: #fff4e6; --bubble-ai: #2e2a25;
     --demo: #6fbf8f; --demo-soft: #1e3328; --shadow: 0 1px 3px rgba(0,0,0,0.35);
@@ -92,7 +100,7 @@
     border-radius: 16px; box-shadow: var(--shadow);
   }
   .card.pad { padding: 16px; }
-  .card h2 {
+  .card h2, .card .card-h {
     margin: 0 0 12px; font-size: 11px; font-weight: 700;
     letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
   }
@@ -138,7 +146,7 @@
     font: inherit; font-weight: 600; padding: 10px 16px; width: 100%;
   }
   .btn:hover { filter: brightness(0.95); }
-  .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+  .btn[disabled], .btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
 
   /* itinerary */
   .empty {
@@ -161,7 +169,11 @@
   }
 
   .itin { display: flex; flex-direction: column; gap: 14px; }
-  .itin-head h3 { margin: 0; font-size: 19px; letter-spacing: -0.01em; text-wrap: balance; }
+  .itin-head h2 {
+    margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -0.01em;
+    text-transform: none; color: var(--ink); text-wrap: balance;
+  }
+  .itin-head h2:focus { outline: none; }
   .itin-head p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
   .distance { margin-top: 10px; font-size: 12.5px; color: var(--accent); font-weight: 600; }
 
@@ -170,7 +182,7 @@
     background: var(--accent-soft); color: var(--accent);
     font-size: 11.5px; font-weight: 700; border-radius: 8px; padding: 2px 8px; margin-right: 8px;
   }
-  .day-head b { font-size: 14.5px; }
+  .day-head h3 { display: inline; font-size: 14.5px; margin: 0; }
   .day-date { font-size: 11.5px; color: var(--faint); }
   .drive-sum { font-size: 12.5px; color: var(--muted); margin: 4px 0 12px; }
 
@@ -213,13 +225,14 @@
   .chat header h2 { margin: 0; }
   .chat header p { margin: 2px 0 0; font-size: 11.5px; color: var(--faint); }
   .msgs { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-  .msg { max-width: 88%; padding: 8px 12px; border-radius: 14px; white-space: pre-wrap; font-size: 13.5px; }
+  .msg { max-width: 88%; padding: 8px 12px; border-radius: 14px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13.5px; }
   .msg.user { align-self: flex-end; background: var(--bubble-user); color: var(--bubble-user-ink); border-bottom-right-radius: 4px; }
   .msg.ai { align-self: flex-start; background: var(--bubble-ai); border-bottom-left-radius: 4px; }
   .msg.ai .cursor { display: inline-block; width: 7px; height: 13px; background: var(--accent); vertical-align: -2px; animation: blink 0.8s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
 
   .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; }
+  .chips[hidden] { display: none; }
   .chip {
     border: 1px solid var(--line); background: var(--card-2); color: var(--muted);
     font: inherit; font-size: 12px; border-radius: 999px; padding: 4px 11px; cursor: pointer;
@@ -235,7 +248,17 @@
 
   .footnote { margin-top: 16px; text-align: center; font-size: 11.5px; color: var(--faint); }
   .footnote a { color: var(--muted); }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  @media print {
+    .card, .stop { break-inside: avoid; }
+  }
 </style>
+</head>
+<body>
 
 <div class="wrap">
   <header class="app">
@@ -305,7 +328,7 @@
     </div>
 
     <!-- CENTER: itinerary -->
-    <main id="itinerary" aria-live="polite">
+    <main id="itinerary">
       <div class="empty" id="emptyState">
         <div class="glyph">🗺️</div>
         <p style="max-width:34ch; margin:0;">Your travelers and trip are filled in.<br>Hit <b>Plan my trip</b> to watch the companion build the route.</p>
@@ -318,7 +341,7 @@
         <h2>Companion</h2>
         <p>Ask for anything — it knows the travelers and the plan.</p>
       </header>
-      <div class="msgs" id="msgs"></div>
+      <div class="msgs" id="msgs" role="log" aria-label="Conversation"></div>
       <div class="chips" id="chips" hidden>
         <button class="chip" data-q="Make day 2 more relaxed">Make day 2 more relaxed</button>
         <button class="chip" data-q="We're running 2 hours late">We're running 2 hours late</button>
@@ -333,6 +356,7 @@
   </div>
 
   <p class="footnote">Mockup of Travel Companion AI — in the real app these responses come from Claude, live.</p>
+  <div id="status" role="status" class="sr-only"></div>
 </div>
 
 <script>
@@ -343,7 +367,7 @@ const ICONS = { drive:"🚗", meal:"🍽️", sight:"🏞️", break:"☕", acti
 
 const baseItinerary = () => ({
   tripTitle: "Mumbai to Goa: Konkan Coast Family Drive",
-  overview: "Three days down NH66 with the whole family in mind — an easy first leg to Ganpatipule so Kiran gets beach time on day one, temple and market stops for Aai, sunrise photo windows for Priya, and pure-veg meals throughout.",
+  overview: "Three days down NH66 with the whole family in mind — an easy first leg to Ganpatipule so Kiran gets beach time on day one, temple and market stops for Aai, a sunrise photo window for Priya, and pure-veg meals throughout.",
   totalDistance: "~590 km / 13h driving over 2 days, day 3 local",
   days: [
     {
@@ -355,6 +379,7 @@ const baseItinerary = () => ({
         { time:"10:00", type:"break", title:"Tea & stretch stop", location:"Mangaon", dur:"25m", det:"Scheduled for Aai's 2-hour break rhythm; clean washrooms at the highway plaza." },
         { time:"12:30", type:"meal", title:"Konkani veg thali lunch", location:"Chiplun", dur:"1h", det:"Sol kadhi, bhakri and modak — pure-veg kitchen, mild options for Kiran." },
         { time:"13:45", type:"sight", title:"Parshuram Temple", location:"Chiplun", dur:"40m", det:"A short, shaded stop for Aai — 300-year-old Konkan temple just off the highway." },
+        { time:"16:00", type:"break", title:"Tea & stretch stop", location:"Hatkhamba", dur:"15m", det:"Aai's afternoon leg-stretch before the final coastal run down to Ganpatipule." },
         { time:"17:00", type:"activity", title:"Beach hour", location:"Ganpatipule Beach", dur:"1h 15m", det:"Kiran's reward for the long drive — calm white-sand stretch right by the stay." },
         { time:"18:30", type:"checkin", title:"Check in & sunset dinner", location:"Ganpatipule", dur:"1h", det:"Sea-facing veg dinner; early night before tomorrow's sunrise." }
       ],
@@ -412,14 +437,14 @@ function renderItinerary(highlightDays) {
   root.innerHTML = `
     <div class="itin">
       <section class="card pad itin-head">
-        <h3>${esc(itin.tripTitle)}</h3>
+        <h2 tabindex="-1">${esc(itin.tripTitle)}</h2>
         <p>${esc(itin.overview)}</p>
         <div class="distance mono">🚗 ${esc(itin.totalDistance)}</div>
       </section>
       ${itin.days.map(d => `
         <section class="card pad ${hl.has(d.day) ? "flash" : ""}">
           <div class="day-head">
-            <div><span class="day-pill">Day ${d.day}</span><b>${esc(d.title)}</b></div>
+            <div><span class="day-pill">Day ${d.day}</span><h3>${esc(d.title)}</h3></div>
             <span class="day-date mono">${esc(d.date)}</span>
           </div>
           ${d.driveSummary ? `<div class="drive-sum">🛣️ ${esc(d.driveSummary)}</div>` : ""}
@@ -445,10 +470,11 @@ function renderItinerary(highlightDays) {
             </div>` : ""}
         </section>`).join("")}
       <section class="card pad tips">
-        <h2>Tips for this trip</h2>
+        <h3 class="card-h">Tips for this trip</h3>
         <ul>${itin.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
       </section>
     </div>`;
+  if (hl.size) $("status").textContent = "Day " + [...hl].join(" and ") + " updated";
 }
 
 function addMsg(role, text) {
@@ -462,6 +488,7 @@ function addMsg(role, text) {
 
 function streamReply(text, after) {
   const el = addMsg("ai", "");
+  el.setAttribute("aria-hidden", "true");
   const cursor = document.createElement("span");
   cursor.className = "cursor";
   el.appendChild(cursor);
@@ -474,6 +501,8 @@ function streamReply(text, after) {
     } else {
       clearInterval(tick);
       cursor.remove();
+      el.removeAttribute("aria-hidden");
+      $("status").textContent = text;
       busy = false;
       if (after) after();
     }
@@ -484,21 +513,26 @@ function streamReply(text, after) {
 $("planBtn").addEventListener("click", () => {
   if (busy) return;
   busy = true;
-  $("planBtn").disabled = true;
+  $("planBtn").setAttribute("aria-disabled", "true");
   $("planBtn").textContent = "Planning your trip…";
+  $("status").textContent = "Planning your trip…";
   $("itinerary").innerHTML = `
     <div class="empty">
-      <div class="spinner" role="status" aria-label="Planning"></div>
+      <div class="spinner" aria-hidden="true"></div>
       <p style="margin:0;">Planning the route, stops, meals and stays<br>around Dhanjit, Priya, Aai and Kiran…</p>
     </div>`;
   setTimeout(() => {
     itin = baseItinerary();
     renderItinerary();
-    $("planBtn").textContent = "Re-plan trip";
-    $("planBtn").disabled = false;
-    $("chips").hidden = false;
+    $("status").textContent = "Itinerary ready: " + itin.tripTitle;
+    $("itinerary").querySelector("h2").focus();
     streamReply(
-      "Done! Three days, Mumbai to Goa down NH66. I kept day 1's ghat section early and cool for Kiran's motion sickness, locked in Aai's stretch breaks every two hours, found pure-veg kitchens for every meal, and gave Priya two sunrise windows. Beach time both coastal evenings. Ask me to change anything."
+      "Done! Three days, Mumbai to Goa down NH66. I kept day 1's ghat section early and cool for Kiran's motion sickness, locked in Aai's stretch breaks every two hours, found pure-veg kitchens for every meal, and gave Priya her sunrise window at Ganpatipule. Beach time both coastal evenings. Ask me to change anything.",
+      () => {
+        $("planBtn").textContent = "Re-plan trip";
+        $("planBtn").removeAttribute("aria-disabled");
+        $("chips").hidden = false;
+      }
     );
   }, 1900);
 });
@@ -515,15 +549,16 @@ function relaxDay2() {
     { time:"12:00", type:"break", title:"Tea & stretch stop", location:"Rajapur", dur:"30m", det:"Aai's break, with margin to spare." },
     { time:"13:15", type:"meal", title:"Unhurried Malvani veg thali", location:"Sawantwadi", dur:"1h 15m", det:"Same thali house, no clock-watching — toy market is right there if the mood strikes." },
     { time:"16:00", type:"checkin", title:"Check in & pool time", location:"Assagao, North Goa", dur:"1h 30m", det:"Kiran gets the pool instead of another car seat hour." },
-    { time:"18:15", type:"activity", title:"Sunset at Vagator", location:"Vagator Beach", dur:"1h 15m", det:"Unchanged — it's the best hour of the day." }
+    { time:"18:15", type:"activity", title:"Sunset at Vagator", location:"Vagator Beach", dur:"1h 15m", det:"Pushed 15 minutes — still the best hour of the day." }
   ];
+  itin.totalDistance = "~580 km / 12h driving over 2 days, day 3 local";
   return "Day 2 is now properly relaxed: breakfast pushed to 8:30, the Aare Ware viewpoint detour dropped, a longer lunch at Sawantwadi, and you reach the villa by 4 with pool time for Kiran before sunset at Vagator. Driving drops from ~6h to ~5h.";
 }
 
 function runningLate() {
   const d = itin.days[0];
   d.stops = d.stops.map(s => ({ ...s }));
-  const shift = { "06:30":"08:30","07:45":"09:45","10:00":"12:00","12:30":"14:00","13:45":"—","17:00":"18:15","18:30":"19:15" };
+  const shift = { "06:30":"08:30","07:45":"09:45","10:00":"12:00","12:30":"14:00","13:45":"—","16:00":"17:00","17:00":"18:15","18:30":"19:30" };
   d.stops.forEach(s => { if (shift[s.time]) s.time = shift[s.time]; });
   d.stops = d.stops.filter(s => s.time !== "—");
   d.stops[2].det = "Break doubles as a quick bite — we merged the tea stop with a light snack to claw back time.";
@@ -541,6 +576,7 @@ function rainyDay3() {
     { time:"15:30", type:"sight", title:"Fontainhas walk, umbrellas up", location:"Panjim Latin Quarter", dur:"1h", det:"The ochre walls photograph even better wet — Priya wins either way." },
     { time:"17:00", type:"meal", title:"Bakery stop & early dinner", location:"Panjim", dur:"1h 15m", det:"Bebinca and hot chai while the rain does its thing." }
   ];
+  d.driveSummary = "~85 km loop via Pilerne, Ponda & Panjim — all-weather roads";
   return "Day 3 is now rain-ready: Fort Aguada and beach time swap out for the Museum of Goa and a covered spice-farm tour with a veg lunch at Ponda. Kept the Fontainhas walk — it's better in the rain, and Priya's photos will thank you. If the sky clears by 5, we can still sneak in Miramar sunset.";
 }
 
@@ -566,16 +602,24 @@ function respond(text) {
 
 function send(text) {
   const t = (text || "").trim();
-  if (!t || busy) return;
+  if (!t || busy) return false;
   busy = true;
   addMsg("user", t);
-  $("chatInput").value = "";
   setTimeout(() => respond(t), 650);
+  return true;
 }
 
-$("sendBtn").addEventListener("click", () => send($("chatInput").value));
-$("chatInput").addEventListener("keydown", (e) => { if (e.key === "Enter") send($("chatInput").value); });
+function sendFromInput() {
+  if (send($("chatInput").value)) $("chatInput").value = "";
+}
+
+$("sendBtn").addEventListener("click", sendFromInput);
+$("chatInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.isComposing && e.keyCode !== 229) sendFromInput();
+});
 document.querySelectorAll(".chip").forEach(c =>
   c.addEventListener("click", () => send(c.dataset.q))
 );
 </script>
+</body>
+</html>
