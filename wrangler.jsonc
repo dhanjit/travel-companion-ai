@@ -1,16 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "travel-companion-ai",
-  "main": ".open-next/worker.js",
   "compatibility_date": "2026-06-01",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Static mockup site only — serves site/ at the root. No build step, no
+  // API key needed. To deploy the real Next.js app instead, replace this
+  // file's contents with wrangler.opennext.jsonc and set the
+  // ANTHROPIC_API_KEY secret on the Worker.
   "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS"
-  },
-  "observability": {
-    "enabled": true
+    "directory": "./site"
   }
-  // Secrets (set in the Cloudflare dashboard or via `wrangler secret put`):
-  //   ANTHROPIC_API_KEY
 }

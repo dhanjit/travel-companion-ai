@@ -1,0 +1,24 @@
+// PARKED config for the real Next.js app (OpenNext on Workers). Not used by
+// wrangler. When you're ready to go live with real Claude planning: copy this
+// file over wrangler.jsonc and add the ANTHROPIC_API_KEY secret to the Worker.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "travel-companion-ai",
+  "main": ".open-next/worker.js",
+  // Runs before `wrangler deploy` / `wrangler dev`, so Cloudflare Workers
+  // Builds works with its default deploy command (npx wrangler deploy).
+  "build": {
+    "command": "npx opennextjs-cloudflare build"
+  },
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+  // Secrets (set in the Cloudflare dashboard or via `wrangler secret put`):
+  //   ANTHROPIC_API_KEY
+}

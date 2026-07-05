@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "preview": "opennextjs-cloudflare preview",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.110.0",
