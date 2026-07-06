@@ -24,5 +24,6 @@ across dhanjit's repos):
 - `npm run build` passes.
 - If you touched the Worker/deploy config: `npx wrangler deploy --dry-run`
   succeeds.
-- If you touched `site/index.html`: open it in a browser — it must work with
-  no backend and no API key, in both light and dark themes.
+- If you touched the static site (`site/index.html` landing or
+  `site/demo/index.html` interactive demo): open it in a browser — it must work
+  with no backend and no API key, in both light and dark themes.

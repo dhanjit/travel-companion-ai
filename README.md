@@ -30,7 +30,7 @@ Open http://localhost:3000.
 
 ## Hosting on Cloudflare Workers
 
-**Current deployment: mockup only.** `wrangler.jsonc` deploys the static demo in `site/` (no build step, no API key) — live at [humsafar.dhanjit.me](https://humsafar.dhanjit.me). To switch the Worker to the real app: copy `wrangler.opennext.jsonc` over `wrangler.jsonc` and add the `ANTHROPIC_API_KEY` secret to the Worker.
+**Current deployment: mockup only.** `wrangler.jsonc` deploys the static site in `site/` (no build step, no API key) — live at [humsafar.dhanjit.me](https://humsafar.dhanjit.me): a landing page (`site/index.html`) linking to the interactive demo (`site/demo/index.html`, at `/demo`). To switch the Worker to the real app: copy `wrangler.opennext.jsonc` over `wrangler.jsonc` and add the `ANTHROPIC_API_KEY` secret to the Worker.
 
 The real app is set up for Cloudflare Workers via [OpenNext](https://opennext.js.org/cloudflare) (`wrangler.opennext.jsonc` + `open-next.config.ts`).
 

@@ -3,851 +3,173 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Travel Companion AI — Demo</title>
+<title>Travel Companion AI — an AI road-trip planner that knows your travelers</title>
+<meta name="description" content="An AI road-trip companion that knows the people travelling — their ages, diets, interests and quirks — and plans the whole drive around them, then adjusts on the fly.">
 <style>
   :root {
-    --bg: #faf8f4;
-    --card: #ffffff;
-    --card-2: #f5f2ec;
-    --ink: #1c1917;
-    --muted: #6f675f;
-    --faint: #766e66;
-    --line: #e7e2da;
-    --accent: #c86a15;
-    --accent-soft: #f7e8d8;
-    --accent-ink: #ffffff;
-    --bubble-user: #c86a15;
-    --bubble-user-ink: #fff8f0;
-    --bubble-ai: #f0ece5;
-    --demo: #2f7d4f;
-    --demo-soft: #e2f0e7;
-    --shadow: 0 1px 3px rgba(28, 25, 23, 0.06);
+    --bg: #faf8f4; --card: #ffffff; --card-2: #f5f2ec; --ink: #1c1917;
+    --muted: #6f675f; --faint: #766e66; --line: #e7e2da;
+    --accent: #c86a15; --accent-soft: #f7e8d8; --accent-ink: #ffffff;
+    --demo: #2f7d4f; --demo-soft: #e2f0e7;
+    --shadow: 0 1px 3px rgba(28,25,23,0.06);
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #161412;
-      --card: #211e1b;
-      --card-2: #2a2622;
-      --ink: #e8e4df;
-      --muted: #a39a91;
-      --faint: #8d857c;
-      --line: #383329;
-      --accent: #f0a24b;
-      --accent-soft: #3a2c1a;
-      --accent-ink: #1c1409;
-      --bubble-user: #b3661d;
-      --bubble-user-ink: #fff4e6;
-      --bubble-ai: #2e2a25;
-      --demo: #6fbf8f;
-      --demo-soft: #1e3328;
-      --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+      --bg: #161412; --card: #211e1b; --card-2: #2a2622; --ink: #e8e4df;
+      --muted: #a39a91; --faint: #8d857c; --line: #383329;
+      --accent: #f0a24b; --accent-soft: #3a2c1a; --accent-ink: #1c1409;
+      --demo: #6fbf8f; --demo-soft: #1e3328;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
     }
   }
-  :root[data-theme="light"] {
-    color-scheme: light;
-    --bg: #faf8f4; --card: #ffffff; --card-2: #f5f2ec; --ink: #1c1917;
-    --muted: #6f675f; --faint: #766e66; --line: #e7e2da;
-    --accent: #c86a15; --accent-soft: #f7e8d8; --accent-ink: #ffffff;
-    --bubble-user: #c86a15; --bubble-user-ink: #fff8f0; --bubble-ai: #f0ece5;
-    --demo: #2f7d4f; --demo-soft: #e2f0e7; --shadow: 0 1px 3px rgba(28,25,23,0.06);
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --bg: #161412; --card: #211e1b; --card-2: #2a2622; --ink: #e8e4df;
-    --muted: #a39a91; --faint: #8d857c; --line: #383329;
-    --accent: #f0a24b; --accent-soft: #3a2c1a; --accent-ink: #1c1409;
-    --bubble-user: #b3661d; --bubble-user-ink: #fff4e6; --bubble-ai: #2e2a25;
-    --demo: #6fbf8f; --demo-soft: #1e3328; --shadow: 0 1px 3px rgba(0,0,0,0.35);
-  }
-
   * { box-sizing: border-box; }
   body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   }
-  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px; }
+  a { color: var(--accent); }
 
-  .wrap { max-width: 1500px; margin: 0 auto; padding: 16px; }
-
-  header.app {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
-  }
-  .brand h1 { font-size: 18px; margin: 0; letter-spacing: -0.01em; }
-  .brand h1 .ai { color: var(--accent); }
-  .brand p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
-  .demo-badge {
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 48px; }
+  .brand { display: flex; align-items: baseline; gap: 8px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand .ai { color: var(--accent); }
+  .badge {
     display: inline-flex; align-items: center; gap: 6px;
     background: var(--demo-soft); color: var(--demo);
     border: 1px solid color-mix(in srgb, var(--demo) 30%, transparent);
     font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
     padding: 4px 10px; border-radius: 999px;
   }
-  .demo-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--demo); }
+  .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--demo); }
 
-  .grid {
-    display: grid; gap: 16px;
-    grid-template-columns: 320px minmax(0, 1fr) 360px;
-    align-items: start;
-  }
-  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
-
-  .card {
-    background: var(--card); border: 1px solid var(--line);
-    border-radius: 16px; box-shadow: var(--shadow);
-  }
-  .card.pad { padding: 16px; }
-  .card h2, .card .card-h {
-    margin: 0 0 12px; font-size: 11px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
-  }
-
-  .col-left { display: flex; flex-direction: column; gap: 16px; }
-
-  .traveler {
-    border: 1px solid var(--line); background: var(--card-2);
-    border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
-  }
-  .traveler:last-child { margin-bottom: 0; }
-  .traveler .who { display: flex; align-items: baseline; gap: 8px; }
-  .traveler .who b { font-size: 14px; }
-  .traveler .who span { font-size: 11px; color: var(--muted); }
-  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-  .tag {
-    font-size: 11px; color: var(--muted);
-    background: var(--card); border: 1px solid var(--line);
-    border-radius: 999px; padding: 1px 8px;
-  }
-  .tag.diet { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
-
-  .field { margin-bottom: 8px; }
-  .field label {
-    display: block; font-size: 10px; font-weight: 600;
-    letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); margin-bottom: 2px;
-  }
-  .field input, .field select, .field textarea {
-    width: 100%; border: 1px solid var(--line); border-radius: 10px;
-    background: var(--card); color: var(--ink);
-    padding: 6px 9px; font: inherit; font-size: 13px;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus,
-  .chat input:focus, button:focus-visible {
-    outline: 2px solid var(--accent); outline-offset: 1px;
-  }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    border: none; border-radius: 12px; cursor: pointer;
+  .hero { text-align: center; padding: 8px 0 40px; }
+  .hero h1 { font-size: 40px; line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 16px; text-wrap: balance; }
+  .hero h1 .ai { color: var(--accent); }
+  .hero p { font-size: 18px; color: var(--muted); max-width: 60ch; margin: 0 auto 28px; text-wrap: balance; }
+  .cta {
+    display: inline-flex; align-items: center; gap: 8px;
     background: var(--accent); color: var(--accent-ink);
-    font: inherit; font-weight: 600; padding: 10px 16px; width: 100%;
+    font-size: 16px; font-weight: 600; text-decoration: none;
+    padding: 13px 24px; border-radius: 12px;
   }
-  .btn:hover { filter: brightness(0.95); }
-  .btn[disabled], .btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+  .cta:hover { filter: brightness(0.95); }
+  .cta-note { display: block; margin-top: 12px; font-size: 13px; color: var(--faint); }
 
-  /* itinerary */
-  .empty {
-    border: 1.5px dashed var(--line); border-radius: 16px;
-    min-height: 340px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; text-align: center;
-    color: var(--muted); padding: 32px; gap: 8px;
-    background: color-mix(in srgb, var(--card) 55%, transparent);
-  }
-  .empty .glyph { font-size: 34px; }
-  .spinner {
-    width: 28px; height: 28px; border-radius: 50%;
-    border: 3px solid var(--accent); border-top-color: transparent;
-    animation: spin 0.9s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) {
-    .spinner { animation-duration: 2.5s; }
-    * { scroll-behavior: auto !important; }
-  }
+  h2.section { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 48px 0 16px; }
 
-  .itin { display: flex; flex-direction: column; gap: 14px; }
-  .itin-head h2 {
-    margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -0.01em;
-    text-transform: none; color: var(--ink); text-wrap: balance;
-  }
-  .itin-head h2:focus { outline: none; }
-  .itin-head p { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
-  .distance { margin-top: 10px; font-size: 12.5px; color: var(--accent); font-weight: 600; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .feature { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 20px; }
+  .feature .ico { font-size: 24px; }
+  .feature h3 { font-size: 17px; margin: 10px 0 6px; letter-spacing: -0.01em; }
+  .feature p { margin: 0; color: var(--muted); font-size: 14.5px; }
 
-  .day-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
-  .day-pill {
-    background: var(--accent-soft); color: var(--accent);
-    font-size: 11.5px; font-weight: 700; border-radius: 8px; padding: 2px 8px; margin-right: 8px;
-  }
-  .day-head h3 { display: inline; font-size: 14.5px; margin: 0; }
-  .day-head-right { display: flex; align-items: center; gap: 10px; }
-  .day-action {
-    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-    background: var(--accent-soft); color: var(--accent);
-    font: inherit; font-size: 11.5px; font-weight: 600;
-    border-radius: 999px; padding: 3px 10px; cursor: pointer;
-  }
-  .day-action:hover { filter: brightness(0.97); }
-  .day-date { font-size: 11.5px; color: var(--faint); }
-  .drive-sum { font-size: 12.5px; color: var(--muted); margin: 4px 0 12px; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+  @media (max-width: 720px) { .split { grid-template-columns: 1fr; } .hero h1 { font-size: 32px; } }
+  .split .copy p { color: var(--muted); }
+  .split .copy p strong { color: var(--ink); font-weight: 600; }
 
-  .stop { display: flex; gap: 10px; position: relative; padding-bottom: 14px; }
-  .stop:last-child { padding-bottom: 0; }
-  .stop::before {
-    content: ""; position: absolute; left: 11px; top: 26px; bottom: 2px;
-    width: 1.5px; background: var(--line);
-  }
-  .stop:last-child::before { display: none; }
-  .stop .ico {
-    position: relative; z-index: 1; width: 24px; height: 24px; flex: none;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; background: var(--card-2); border: 1px solid var(--line); border-radius: 50%;
-  }
-  .stop .t { font-size: 11.5px; color: var(--faint); margin-right: 6px; }
-  .stop .title { font-weight: 600; font-size: 13.5px; }
-  .stop .dur { font-size: 11.5px; color: var(--faint); }
-  .stop .loc { font-size: 12px; color: var(--muted); }
-  .stop .det { font-size: 13px; color: color-mix(in srgb, var(--ink) 78%, var(--muted)); margin-top: 2px; max-width: 68ch; }
+  /* static illustration of the guided-choice flow */
+  .demo-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+  .demo-card .ctxrow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .demo-card .ctxrow .lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+  .pill { font-size: 11.5px; border-radius: 999px; padding: 3px 9px; border: 1px solid var(--line); color: var(--muted); background: var(--card-2); }
+  .pill.on { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); font-weight: 600; }
+  .demo-card .body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .bubble { max-width: 90%; padding: 8px 12px; border-radius: 14px; font-size: 13.5px; background: var(--card-2); border-bottom-left-radius: 4px; }
+  .optbox { display: flex; flex-wrap: wrap; gap: 6px; }
+  .optbox .trail { flex-basis: 100%; font-size: 11px; color: var(--faint); }
+  .optbox .why { flex-basis: 100%; font-size: 11.5px; color: var(--faint); font-style: italic; }
+  .chip { font-size: 12px; border-radius: 999px; padding: 4px 11px; border: 1px solid var(--line); color: var(--muted); background: var(--card-2); }
+  .chip.lead { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); font-weight: 600; }
+  .chip .note { color: var(--faint); }
+  .chip.dim { opacity: 0.5; }
 
-  .stay {
-    margin-top: 12px; background: var(--card-2); border-radius: 12px;
-    padding: 10px 12px; font-size: 13px;
-  }
-  .stay b { font-weight: 600; }
-  .stay .loc { color: var(--muted); }
-  .stay p { margin: 3px 0 0; color: var(--muted); }
+  .travelers { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tvr { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; font-size: 13.5px; }
+  .tvr b { font-weight: 600; }
+  .tvr span { color: var(--faint); font-size: 12px; }
 
-  .tips ul { margin: 0; padding-left: 20px; color: var(--muted); }
-  .tips li { margin-bottom: 5px; max-width: 70ch; }
-
-  .flash { animation: flash 1.2s ease-out; }
-  @keyframes flash { 0% { box-shadow: 0 0 0 2px var(--accent); } 100% { box-shadow: var(--shadow); } }
-
-  /* chat */
-  .chat { display: flex; flex-direction: column; min-height: 420px; }
-  @media (min-width: 1101px) { .chat { position: sticky; top: 16px; height: calc(100vh - 96px); } }
-  .chat header { padding: 12px 16px; border-bottom: 1px solid var(--line); }
-  .chat header h2 { margin: 0; }
-  .chat header p { margin: 2px 0 0; font-size: 11.5px; color: var(--faint); }
-  .msgs { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-  .msg { max-width: 88%; padding: 8px 12px; border-radius: 14px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13.5px; }
-  .msg.user { align-self: flex-end; background: var(--bubble-user); color: var(--bubble-user-ink); border-bottom-right-radius: 4px; }
-  .msg.ai { align-self: flex-start; background: var(--bubble-ai); border-bottom-left-radius: 4px; }
-  .msg.ai .cursor { display: inline-block; width: 7px; height: 13px; background: var(--accent); vertical-align: -2px; animation: blink 0.8s step-end infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; }
-  .chips[hidden] { display: none; }
-  .msg-opts { display: flex; flex-wrap: wrap; gap: 6px; max-width: 88%; align-self: flex-start; }
-  .opts-why { flex-basis: 100%; font-size: 11.5px; color: var(--faint); font-style: italic; margin-bottom: 2px; }
-  .msg-opts .chip[disabled] { opacity: 0.55; cursor: default; }
-  .msg-opts .chip[disabled]:hover { border-color: var(--line); color: var(--muted); }
-  .msg-opts .chip.sel {
-    border-color: var(--accent); color: var(--accent);
-    background: var(--accent-soft); opacity: 1; cursor: default;
-  }
-  .msg-opts .chip.sel:hover { border-color: var(--accent); color: var(--accent); }
-  .chip {
-    border: 1px solid var(--line); background: var(--card-2); color: var(--muted);
-    font: inherit; font-size: 12px; border-radius: 999px; padding: 4px 11px; cursor: pointer;
-  }
-  .chip:hover { border-color: var(--accent); color: var(--accent); }
-
-  .chat footer { border-top: 1px solid var(--line); padding: 12px; display: flex; gap: 8px; }
-  .chat footer input {
-    flex: 1; border: 1px solid var(--line); border-radius: 12px;
-    background: var(--card); color: var(--ink); padding: 9px 12px; font: inherit; font-size: 13.5px;
-  }
-  .chat footer .btn { width: auto; padding: 9px 16px; }
-
-  .footnote { margin-top: 16px; text-align: center; font-size: 11.5px; color: var(--faint); }
-  .footnote a { color: var(--muted); }
-
-  .sr-only {
-    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-  }
-  @media print {
-    .card, .stop { break-inside: avoid; }
-  }
+  .foot-cta { text-align: center; margin: 48px 0 8px; }
+  footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); text-align: center; font-size: 13px; color: var(--faint); }
+  footer a { color: var(--muted); }
 </style>
 </head>
 <body>
-
 <div class="wrap">
-  <header class="app">
-    <div class="brand">
-      <h1>🧭 Travel Companion <span class="ai">AI</span></h1>
-      <p>Knows your travelers · plans the drive · adjusts on the fly</p>
-    </div>
-    <span class="demo-badge"><span class="dot"></span>Interactive demo · responses simulated</span>
-  </header>
-
-  <div class="grid">
-    <!-- LEFT: travelers + trip -->
-    <div class="col-left">
-      <section class="card pad" aria-label="Travelers">
-        <h2>Travelers</h2>
-        <div class="traveler">
-          <div class="who"><b>Dhanjit</b><span>32 · driver</span></div>
-          <div class="tags">
-            <span class="tag diet">vegetarian</span>
-            <span class="tag">history</span><span class="tag">street food</span>
-          </div>
-        </div>
-        <div class="traveler">
-          <div class="who"><b>Priya</b><span>30 · navigator</span></div>
-          <div class="tags">
-            <span class="tag">photography</span><span class="tag">coffee</span>
-            <span class="tag">wants sunrise shots</span>
-          </div>
-        </div>
-        <div class="traveler">
-          <div class="who"><b>Aai</b><span>58 · grandma</span></div>
-          <div class="tags">
-            <span class="tag diet">strict vegetarian</span>
-            <span class="tag">temples</span><span class="tag">stretch break every 2h</span>
-          </div>
-        </div>
-        <div class="traveler">
-          <div class="who"><b>Kiran</b><span>6 · kid</span></div>
-          <div class="tags">
-            <span class="tag diet">no nuts</span>
-            <span class="tag">beaches</span><span class="tag">gets carsick on ghats</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="card pad" aria-label="Trip">
-        <h2>Trip</h2>
-        <div class="row2">
-          <div class="field"><label for="from">From</label><input id="from" value="Mumbai"></div>
-          <div class="field"><label for="to">To</label><input id="to" value="Goa"></div>
-        </div>
-        <div class="row2">
-          <div class="field"><label for="d1">Start</label><input id="d1" type="date" value="2026-07-10"></div>
-          <div class="field"><label for="d2">End</label><input id="d2" type="date" value="2026-07-12"></div>
-        </div>
-        <div class="row2">
-          <div class="field"><label for="pace">Pace</label>
-            <select id="pace"><option>Relaxed</option><option selected>Balanced</option><option>Packed</option></select>
-          </div>
-          <div class="field"><label for="budget">Budget</label><input id="budget" value="mid-range"></div>
-        </div>
-        <div class="field"><label for="wishes">Wishes</label>
-          <input id="wishes" value="beach time for Kiran, no night driving">
-        </div>
-        <button class="btn" id="planBtn">Plan my trip</button>
-      </section>
-    </div>
-
-    <!-- CENTER: itinerary -->
-    <main id="itinerary">
-      <div class="empty" id="emptyState">
-        <div class="glyph">🗺️</div>
-        <p style="max-width:34ch; margin:0;">Your travelers and trip are filled in.<br>Hit <b>Plan my trip</b> to watch the companion build the route.</p>
-      </div>
-    </main>
-
-    <!-- RIGHT: chat -->
-    <section class="card chat" aria-label="Companion chat">
-      <header>
-        <h2>Companion</h2>
-        <p>Ask for anything — it knows the travelers and the plan.</p>
-      </header>
-      <div class="msgs" id="msgs" role="log" aria-label="Conversation"></div>
-      <div class="chips" id="chips" hidden>
-        <button class="chip" data-q="Help me shape day 3">Shape day 3</button>
-        <button class="chip" data-q="Make day 2 more relaxed">Make day 2 more relaxed</button>
-        <button class="chip" data-q="We're running 2 hours late">We're running 2 hours late</button>
-        <button class="chip" data-q="Rain forecast — make day 3 indoors">Rain on day 3</button>
-        <button class="chip" data-q="What should we pack?">What should we pack?</button>
-      </div>
-      <footer>
-        <input id="chatInput" placeholder="Ask your companion…" aria-label="Chat message">
-        <button class="btn" id="sendBtn">Send</button>
-      </footer>
-    </section>
+  <div class="topbar">
+    <div class="brand">🧭 Travel Companion <span class="ai">AI</span></div>
+    <span class="badge"><span class="dot"></span>Interactive demo</span>
   </div>
 
-  <p class="footnote">Mockup of Travel Companion AI — in the real app these responses come from Claude, live.</p>
-  <div id="status" role="status" class="sr-only"></div>
+  <section class="hero">
+    <h1>The road-trip planner that<br>knows <span class="ai">who's in the car</span></h1>
+    <p>Give it the people — their ages, diets, interests and quirks — and it plans the whole drive around them: the route, the rest stops, lunch and dinner, and where to sleep. Then you just ask, and it adjusts.</p>
+    <a class="cta" href="/demo">Try the interactive demo →</a>
+    <span class="cta-note">No sign-up · runs in your browser · responses simulated</span>
+  </section>
+
+  <h2 class="section">What it does</h2>
+  <div class="cards">
+    <div class="feature">
+      <div class="ico">🧑‍🤝‍🧑</div>
+      <h3>Knows your travelers</h3>
+      <p>Add everyone going — a strict-veg grandma, a kid who gets carsick, a photographer chasing light. It plans around these specific people, not a generic tourist.</p>
+    </div>
+    <div class="feature">
+      <div class="ico">🗺️</div>
+      <h3>Plans the whole drive</h3>
+      <p>Origin, destination, dates → a day-by-day driving plan: departure times, breaks on the right rhythm, meals that fit every diet, sights matched to interests, and where to stay each night.</p>
+    </div>
+    <div class="feature">
+      <div class="ico">💬</div>
+      <h3>Adjusts on the fly</h3>
+      <p>“Make day 2 relaxed.” “We're running late.” “Rain — move day 3 indoors.” The plan re-renders instantly. All by car, always.</p>
+    </div>
+  </div>
+
+  <h2 class="section">Guided, context-aware choices</h2>
+  <div class="split">
+    <div class="copy">
+      <p>Most planners hand you a blank chat box. This one <strong>offers the next decision</strong> — and each choice narrows toward a concrete change.</p>
+      <p>The options aren't a fixed menu. What it offers <strong>shifts with who's travelling and the moment</strong> — the weather in that window, the time of day, how tired everyone is. Rain rolls in and the covered options move up; the kid's fading and the ambitious plans step back.</p>
+      <p>You can shape a whole day, or tap <strong>“what next here?”</strong> on any single stop.</p>
+    </div>
+    <div class="demo-card" aria-hidden="true">
+      <div class="ctxrow">
+        <span class="lbl">Right now</span>
+        <span class="pill on">☂ Showers</span>
+        <span class="pill">Afternoon</span>
+        <span class="pill on">Tired</span>
+      </div>
+      <div class="body">
+        <div class="bubble">What kind of view spot?</div>
+        <div class="optbox">
+          <div class="trail">Day 3 › Visit › A good view</div>
+          <div class="why">Why these: showery, so the covered cafe leads; the cliff point's a between-showers dash.</div>
+          <span class="chip lead">Cafe with a good view</span>
+          <span class="chip dim">Sea-cliff sunset point <span class="note">· better if it clears</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section">The demo plans around</h2>
+  <div class="travelers">
+    <div class="tvr"><b>Dhanjit</b> <span>32 · vegetarian · history</span></div>
+    <div class="tvr"><b>Priya</b> <span>30 · photography · coffee</span></div>
+    <div class="tvr"><b>Aai</b> <span>58 · strict veg · temples · breaks every 2h</span></div>
+    <div class="tvr"><b>Kiran</b> <span>6 · no nuts · beaches · carsick on ghats</span></div>
+  </div>
+
+  <div class="foot-cta">
+    <a class="cta" href="/demo">Plan a trip in the demo →</a>
+  </div>
+
+  <footer>
+    Travel Companion AI · a mockup — in the real app the planning and chat come from Claude, live.<br>
+    Powered by <a href="https://www.anthropic.com/claude">Claude</a>.
+  </footer>
 </div>
-
-<script>
-"use strict";
-
-/* ---------- data ---------- */
-const ICONS = { drive:"🚗", meal:"🍽️", sight:"🏞️", break:"☕", activity:"🎯", fuel:"⛽", checkin:"🏨", other:"📍" };
-
-const baseItinerary = () => ({
-  tripTitle: "Mumbai to Goa: Konkan Coast Family Drive",
-  overview: "Three days down NH66 with the whole family in mind — an easy first leg to Ganpatipule so Kiran gets beach time on day one, temple and market stops for Aai, a sunrise photo window for Priya, and pure-veg meals throughout.",
-  totalDistance: "~590 km / 13h driving over 2 days, day 3 local",
-  days: [
-    {
-      day: 1, date: "2026-07-10", title: "Mumbai to Ganpatipule",
-      driveSummary: "~330 km on NH66, ~7h with stops",
-      stops: [
-        { time:"06:30", type:"drive", title:"Leave Mumbai before the rush", location:"Sion → Panvel → NH66", dur:"1h 15m", det:"Early start keeps the ghat sections cool and calm — easier on Kiran's motion sickness." },
-        { time:"07:45", type:"meal", title:"Veg breakfast halt", location:"Pen, Raigad", dur:"40m", det:"Poha, idli and filter coffee — quick, fully vegetarian, and Aai can stretch her legs." },
-        { time:"10:00", type:"break", title:"Tea & stretch stop", location:"Mangaon", dur:"25m", det:"Scheduled for Aai's 2-hour break rhythm; clean washrooms at the highway plaza." },
-        { time:"12:30", type:"meal", title:"Konkani veg thali lunch", location:"Chiplun", dur:"1h", det:"Sol kadhi, bhakri and modak — pure-veg kitchen, mild options for Kiran." },
-        { time:"13:45", type:"sight", title:"Parshuram Temple", location:"Chiplun", dur:"40m", det:"A short, shaded stop for Aai — 300-year-old Konkan temple just off the highway." },
-        { time:"16:00", type:"break", title:"Tea & stretch stop", location:"Hatkhamba", dur:"15m", det:"Aai's afternoon leg-stretch before the final coastal run down to Ganpatipule." },
-        { time:"17:00", type:"activity", title:"Beach hour", location:"Ganpatipule Beach", dur:"1h 15m", det:"Kiran's reward for the long drive — calm white-sand stretch right by the stay." },
-        { time:"18:30", type:"checkin", title:"Check in & sunset dinner", location:"Ganpatipule", dur:"1h", det:"Sea-facing veg dinner; early night before tomorrow's sunrise." }
-      ],
-      stay: { name:"Sea-view family resort", location:"Ganpatipule beachfront", notes:"Ground-floor rooms for Aai, beach access for Kiran, and an east-facing lawn for Priya's sunrise shots." }
-    },
-    {
-      day: 2, date: "2026-07-11", title: "Ganpatipule to North Goa",
-      driveSummary: "~260 km via Ratnagiri & Sawantwadi, ~6h with stops",
-      stops: [
-        { time:"06:45", type:"activity", title:"Sunrise on the beach", location:"Ganpatipule", dur:"45m", det:"Golden-hour window for Priya — temple silhouette against the surf." },
-        { time:"08:00", type:"meal", title:"Breakfast at the stay", location:"Ganpatipule", dur:"45m", det:"Ukdiche modak if they have them — then pack up." },
-        { time:"09:30", type:"sight", title:"Aare Ware viewpoint", location:"Ratnagiri coast road", dur:"25m", det:"The Konkan's best 5-minute photo stop — twin beaches from the cliff edge." },
-        { time:"11:15", type:"break", title:"Tea & stretch stop", location:"Rajapur", dur:"25m", det:"Aai's mid-morning break, right on schedule." },
-        { time:"13:00", type:"meal", title:"Malvani veg thali", location:"Sawantwadi", dur:"1h", det:"Solkadhi and vegetable ambat; the thali house is two lanes from the toy market." },
-        { time:"14:15", type:"sight", title:"Wooden toy market", location:"Sawantwadi", dur:"45m", det:"Lacquered wooden toys — Kiran picks one, Aai browses the bazaar." },
-        { time:"16:30", type:"checkin", title:"Check in at the villa", location:"Assagao, North Goa", dur:"45m", det:"Unpack once — same base for two nights." },
-        { time:"18:00", type:"activity", title:"Sunset at Vagator", location:"Vagator Beach", dur:"1h 30m", det:"Red cliffs for photos, gentle shallows for Kiran, chai sellers for everyone." }
-      ],
-      stay: { name:"Family villa with pool", location:"Assagao, North Goa", notes:"Quiet lane, secure parking, kitchenette for Aai's morning tea. Two-night base — no repacking." }
-    },
-    {
-      day: 3, date: "2026-07-12", title: "North Goa, unhurried",
-      driveSummary: "Local hops only, ~35 km total",
-      stops: [
-        { time:"08:30", type:"meal", title:"Cafe breakfast", location:"Assagao", dur:"1h", det:"Good coffee for Priya, veg Goan poi sandwiches, banana pancakes for Kiran." },
-        { time:"10:00", type:"sight", title:"Fort Aguada", location:"Candolim", dur:"1h 15m", det:"17th-century Portuguese fort and lighthouse — Dhanjit's history fix with panoramic monsoon skies." },
-        { time:"11:45", type:"activity", title:"Beach time", location:"Candolim Beach", dur:"1h 30m", det:"Lifeguarded stretch, calmer than Baga — sandcastles for Kiran while lunch is nearby." },
-        { time:"13:30", type:"meal", title:"Pure-veg Goan thali", location:"Panjim", dur:"1h", det:"Khatkhate, mushroom xacuti and bebinca to finish — Aai-approved kitchen." },
-        { time:"15:00", type:"sight", title:"Fontainhas walk", location:"Panjim Latin Quarter", dur:"1h 15m", det:"Ochre-and-indigo Portuguese lanes — Priya's cameras stay busy; azulejo tiles and old bakeries." },
-        { time:"17:00", type:"activity", title:"Sunset & gelato", location:"Miramar Beach", dur:"1h", det:"Wide flat sand where the Mandovi meets the sea — easy finish for all four." }
-      ],
-      stay: { name:"Family villa with pool", location:"Assagao, North Goa", notes:"Second night at the same base." }
-    }
-  ],
-  tips: [
-    "July is peak monsoon on the Konkan — pack rain shells, keep beach swims to lifeguarded zones, and expect dramatic (photogenic) skies.",
-    "Give Kiran a motion-sickness tablet 30 minutes before the Kashedi ghat section on day 1.",
-    "Top up FASTag before leaving — NH66 has back-to-back toll plazas.",
-    "Many beach shacks close for monsoon; the lunch stops chosen here are all-season, indoor kitchens."
-  ]
-});
-
-/* ---------- state ---------- */
-let itin = null;
-let busy = false;
-
-/* ---------- rendering ---------- */
-const $ = (id) => document.getElementById(id);
-const esc = (s) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-
-function renderItinerary(highlightDays) {
-  const root = $("itinerary");
-  if (!itin) return;
-  const hl = new Set(highlightDays || []);
-  root.innerHTML = `
-    <div class="itin">
-      <section class="card pad itin-head">
-        <h2 tabindex="-1">${esc(itin.tripTitle)}</h2>
-        <p>${esc(itin.overview)}</p>
-        <div class="distance mono">🚗 ${esc(itin.totalDistance)}</div>
-      </section>
-      ${itin.days.map(d => `
-        <section class="card pad ${hl.has(d.day) ? "flash" : ""}">
-          <div class="day-head">
-            <div><span class="day-pill">Day ${d.day}</span><h3>${esc(d.title)}</h3></div>
-            <div class="day-head-right">
-              <span class="day-date mono">${esc(d.date)}</span>
-              ${d.day === 3 ? `<button class="day-action" type="button" data-action="shape3">Shape this day →</button>` : ""}
-            </div>
-          </div>
-          ${d.driveSummary ? `<div class="drive-sum">🛣️ ${esc(d.driveSummary)}</div>` : ""}
-          <div>
-            ${d.stops.map(s => `
-              <div class="stop">
-                <div class="ico">${ICONS[s.type] || "📍"}</div>
-                <div>
-                  <div>
-                    <span class="t mono">${esc(s.time)}</span>
-                    <span class="title">${esc(s.title)}</span>
-                    ${s.dur ? `<span class="dur mono"> · ${esc(s.dur)}</span>` : ""}
-                  </div>
-                  <div class="loc">${esc(s.location)}</div>
-                  <div class="det">${esc(s.det)}</div>
-                </div>
-              </div>`).join("")}
-          </div>
-          ${d.stay ? `
-            <div class="stay">
-              🛏️ <b>Stay: ${esc(d.stay.name)}</b> <span class="loc">— ${esc(d.stay.location)}</span>
-              <p>${esc(d.stay.notes)}</p>
-            </div>` : ""}
-        </section>`).join("")}
-      <section class="card pad tips">
-        <h3 class="card-h">Tips for this trip</h3>
-        <ul>${itin.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
-      </section>
-    </div>`;
-  if (hl.size) $("status").textContent = "Day " + [...hl].join(" and ") + " updated";
-}
-
-function addMsg(role, text) {
-  const el = document.createElement("div");
-  el.className = "msg " + role;
-  el.textContent = text;
-  $("msgs").appendChild(el);
-  $("msgs").scrollTop = $("msgs").scrollHeight;
-  return el;
-}
-
-function streamReply(text, after) {
-  const el = addMsg("ai", "");
-  el.setAttribute("aria-hidden", "true");
-  const cursor = document.createElement("span");
-  cursor.className = "cursor";
-  el.appendChild(cursor);
-  const words = text.split(" ");
-  let i = 0;
-  const tick = setInterval(() => {
-    if (i < words.length) {
-      cursor.before((i ? " " : "") + words[i++]);
-      $("msgs").scrollTop = $("msgs").scrollHeight;
-    } else {
-      clearInterval(tick);
-      cursor.remove();
-      el.removeAttribute("aria-hidden");
-      $("status").textContent = text;
-      busy = false;
-      if (after) after();
-    }
-  }, 34);
-}
-
-/* ---------- plan ---------- */
-$("planBtn").addEventListener("click", () => {
-  if (busy) return;
-  busy = true;
-  $("planBtn").setAttribute("aria-disabled", "true");
-  $("planBtn").textContent = "Planning your trip…";
-  $("status").textContent = "Planning your trip…";
-  $("itinerary").innerHTML = `
-    <div class="empty">
-      <div class="spinner" aria-hidden="true"></div>
-      <p style="margin:0;">Planning the route, stops, meals and stays<br>around Dhanjit, Priya, Aai and Kiran…</p>
-    </div>`;
-  setTimeout(() => {
-    itin = baseItinerary();
-    renderItinerary();
-    $("status").textContent = "Itinerary ready: " + itin.tripTitle;
-    $("itinerary").querySelector("h2").focus();
-    streamReply(
-      "Done! Three days, Mumbai to Goa down NH66. I kept day 1's ghat section early and cool for Kiran's motion sickness, locked in Aai's stretch breaks every two hours, found pure-veg kitchens for every meal, and gave Priya her sunrise window at Ganpatipule. Beach time both coastal evenings. Ask me to change anything.",
-      () => {
-        $("planBtn").textContent = "Re-plan trip";
-        $("planBtn").removeAttribute("aria-disabled");
-        $("chips").hidden = false;
-      }
-    );
-  }, 1900);
-});
-
-/* ---------- chat handlers ---------- */
-function relaxDay2() {
-  const d = itin.days[1];
-  d.title = "Ganpatipule to North Goa, the slow way";
-  d.driveSummary = "~250 km direct on NH66, ~5h with stops";
-  d.stops = [
-    d.stops[0],
-    { time:"08:30", type:"meal", title:"Long, lazy breakfast", location:"Ganpatipule", dur:"1h", det:"No rush today — second round of coffee for Priya." },
-    { time:"10:00", type:"drive", title:"Easy cruise south", location:"NH66", dur:"2h", det:"Skipping the viewpoint detour — straight, smooth stretch." },
-    { time:"12:00", type:"break", title:"Tea & stretch stop", location:"Rajapur", dur:"30m", det:"Aai's break, with margin to spare." },
-    { time:"13:15", type:"meal", title:"Unhurried Malvani veg thali", location:"Sawantwadi", dur:"1h 15m", det:"Same thali house, no clock-watching — toy market is right there if the mood strikes." },
-    { time:"16:00", type:"checkin", title:"Check in & pool time", location:"Assagao, North Goa", dur:"1h 30m", det:"Kiran gets the pool instead of another car seat hour." },
-    { time:"18:15", type:"activity", title:"Sunset at Vagator", location:"Vagator Beach", dur:"1h 15m", det:"Pushed 15 minutes — still the best hour of the day." }
-  ];
-  itin.totalDistance = "~580 km / 12h driving over 2 days, day 3 local";
-  return "Day 2 is now properly relaxed: breakfast pushed to 8:30, the Aare Ware viewpoint detour dropped, a longer lunch at Sawantwadi, and you reach the villa by 4 with pool time for Kiran before sunset at Vagator. Driving drops from ~6h to ~5h.";
-}
-
-function runningLate() {
-  const d = itin.days[0];
-  d.stops = d.stops.map(s => ({ ...s }));
-  const shift = { "06:30":"08:30","07:45":"09:45","10:00":"12:00","12:30":"14:00","13:45":"—","16:00":"17:00","17:00":"18:15","18:30":"19:30" };
-  d.stops.forEach(s => { if (shift[s.time]) s.time = shift[s.time]; });
-  d.stops = d.stops.filter(s => s.time !== "—");
-  d.stops[2].det = "Break doubles as a quick bite — we merged the tea stop with a light snack to claw back time.";
-  d.driveSummary = "~330 km on NH66, ~7h — compressed stops to land before dark";
-  return "Adjusted for the 2-hour delay: everything on day 1 shifts right, lunch moves to 14:00 at Chiplun, and I dropped the Parshuram Temple stop so you still reach Ganpatipule at 18:15 — before dark, as you wanted. Aai's breaks stay in. We can slot the temple into the return trip instead.";
-}
-
-function rainyDay3() {
-  const d = itin.days[2];
-  d.title = "North Goa, monsoon-proofed";
-  d.stops = [
-    { time:"08:30", type:"meal", title:"Cafe breakfast", location:"Assagao", dur:"1h", det:"Good coffee for Priya, veg Goan poi sandwiches, banana pancakes for Kiran." },
-    { time:"10:00", type:"sight", title:"Museum of Goa", location:"Pilerne", dur:"1h 30m", det:"Big, playful contemporary art space — genuinely fun for Kiran, dry for everyone." },
-    { time:"12:00", type:"activity", title:"Spice farm tour & lunch", location:"Ponda", dur:"2h 30m", det:"Covered walkways, elephant sightings, and a banana-leaf veg lunch included — Aai's kind of afternoon." },
-    { time:"15:30", type:"sight", title:"Fontainhas walk, umbrellas up", location:"Panjim Latin Quarter", dur:"1h", det:"The ochre walls photograph even better wet — Priya wins either way." },
-    { time:"17:00", type:"meal", title:"Bakery stop & early dinner", location:"Panjim", dur:"1h 15m", det:"Bebinca and hot chai while the rain does its thing." }
-  ];
-  d.driveSummary = "~85 km loop via Pilerne, Ponda & Panjim — all-weather roads";
-  return "Day 3 is now rain-ready: the outdoor stops swap out for the Museum of Goa and a covered spice-farm tour with a veg lunch at Ponda, plus the Fontainhas walk — it's better in the rain, and Priya's photos will thank you. If the sky clears by 5, we can still sneak in Miramar sunset.";
-}
-
-/* ---------- day-3 decision tree ---------- */
-function setDay3(title, driveSummary, stops) {
-  const d = itin.days[2];
-  d.title = title;
-  d.driveSummary = driveSummary;
-  d.stops = stops;
-}
-
-function dayChill() {
-  setDay3("North Goa, villa day", "No driving today — the car stays parked", [
-    { time:"09:00", type:"meal", title:"Slow villa brunch", location:"Assagao", dur:"1h", det:"Banana pancakes for Kiran, a second pot of coffee for Priya — nobody checks the clock." },
-    { time:"10:30", type:"activity", title:"Pool & board games", location:"At the villa", dur:"2h", det:"Kiran in the pool, Aai refereeing carrom from the shaded verandah." },
-    { time:"13:00", type:"meal", title:"Home-style veg lunch", location:"Assagao lane cafe", dur:"1h", det:"Two minutes' walk — dal, rice and bhindi, nothing fancy on purpose." },
-    { time:"14:30", type:"break", title:"Nap & reading hour", location:"At the villa", dur:"1h 30m", det:"Monsoon rain on the roof is the whole point." },
-    { time:"17:00", type:"activity", title:"Evening lane walk", location:"Assagao", dur:"1h", det:"Old Portuguese houses and paddy views if the sky holds — Priya's golden hour." }
-  ]);
-  return "Done — day 3 is now a proper villa day. Nobody gets in the car: pool and carrom in the morning, a two-minute-walk lunch, a rain-on-the-roof nap hour, and an easy lane walk at golden hour. Everyone recharges before the drive home.";
-}
-
-function dayDrive() {
-  setDay3("North Goa, windows-down loop", "~45 km lazy coastal loop — no leg over 45 minutes", [
-    { time:"09:30", type:"drive", title:"Coastal cruise north", location:"Assagao → Morjim", dur:"45m", det:"Easy monsoon-green backroads, music on." },
-    { time:"10:15", type:"activity", title:"Morjim beach walk", location:"Morjim", dur:"1h", det:"The quiet turtle beach — Kiran runs, everyone else strolls." },
-    { time:"11:30", type:"break", title:"Beach-shack chai", location:"Morjim", dur:"30m", det:"Aai's stretch break with a sea view." },
-    { time:"12:15", type:"drive", title:"Chapora river loop", location:"Morjim → Siolim", dur:"45m", det:"Ferry-road views over the river — Priya shoots from the window." },
-    { time:"13:00", type:"meal", title:"Veg thali lunch", location:"Siolim", dur:"1h", det:"Pure-veg kitchen, mild for Kiran." },
-    { time:"14:30", type:"activity", title:"Pool & down time at the villa", location:"Assagao", dur:"3h", det:"The loop passes home anyway — Kiran swims off the car miles while the sun drops." },
-    { time:"18:00", type:"activity", title:"Chapora fort sunset", location:"Vagator", dur:"1h", det:"Short climb, big monsoon sky — the classic finish." }
-  ]);
-  return "Day 3 is now a windows-down day: a lazy 45-km coastal loop with Morjim beach, chai for Aai's break, river views for Priya, a long pool stop at the villa, and the Chapora fort sunset to finish. No single stretch over 45 minutes, so Kiran's stomach stays happy.";
-}
-
-function dayTemples() {
-  setDay3("Temples & Old Goa", "~70 km loop via Ponda & Old Goa", [
-    { time:"08:30", type:"drive", title:"Drive inland to Ponda", location:"Assagao → Ponda", dur:"1h", det:"Out before the market traffic." },
-    { time:"09:30", type:"sight", title:"Shri Mangeshi Temple", location:"Ponda", dur:"1h", det:"Aai's darshan — 18th-century temple with the famous seven-storey lamp tower." },
-    { time:"11:00", type:"break", title:"Chai & stretch stop", location:"Ponda", dur:"25m", det:"Right on Aai's two-hour rhythm." },
-    { time:"12:00", type:"meal", title:"Veg thali lunch", location:"Ponda", dur:"1h", det:"Temple-town kitchens are reliably pure-veg." },
-    { time:"13:30", type:"sight", title:"Basilica of Bom Jesus & Se Cathedral", location:"Old Goa", dur:"1h 30m", det:"Dhanjit's history fix — 400-year-old churches, UNESCO listed." },
-    { time:"15:30", type:"drive", title:"River road home", location:"Ribandar causeway", dur:"45m", det:"Mandovi views the whole way — camera stays out." }
-  ]);
-  return "Day 3 is now a temples-and-history day: Mangeshi Temple for Aai's darshan, a pure-veg temple-town lunch, then Old Goa's basilicas for Dhanjit, home along the Ribandar causeway for Priya's river shots. Breaks land on Aai's two-hour rhythm.";
-}
-
-function dayForts() {
-  setDay3("Forts & viewpoints", "~55 km fort-hop along the coast", [
-    { time:"09:00", type:"sight", title:"Fort Aguada & lighthouse", location:"Candolim", dur:"1h 15m", det:"The big one — ramparts, lighthouse, monsoon horizon." },
-    { time:"10:30", type:"break", title:"Chai & stretch stop", location:"Sinquerim", dur:"25m", det:"Aai's break before the next climb." },
-    { time:"11:15", type:"sight", title:"Reis Magos fort", location:"Verem", dur:"1h", det:"Smaller and kid-friendly — Kiran can actually run the walls here." },
-    { time:"13:00", type:"meal", title:"Pure-veg Goan lunch", location:"Panjim", dur:"1h", det:"Khatkhate and solkadhi near the church square." },
-    { time:"14:30", type:"activity", title:"Miramar beach & chai", location:"Miramar", dur:"2h", det:"Flat sand near Panjim — recovery time between forts for Aai and Kiran." },
-    { time:"17:15", type:"drive", title:"Coast road to Vagator", location:"Miramar → Vagator", dur:"45m", det:"One last windows-down stretch as the light turns." },
-    { time:"18:00", type:"sight", title:"Chapora fort sunset", location:"Vagator", dur:"1h", det:"Save the most photogenic ramparts for last light." }
-  ]);
-  return "Day 3 is now a fort-hop: Aguada's lighthouse first, Reis Magos where Kiran can run the walls, a veg lunch in Panjim, beach recovery time at Miramar, and Chapora saved for actual sunset. Three forts, all short climbs, breaks in between for Aai.";
-}
-
-function dayMarkets() {
-  setDay3("Markets & food lanes", "~30 km of hops — most of the day is on foot", [
-    { time:"09:00", type:"meal", title:"Poi-sandwich breakfast crawl", location:"Assagao", dur:"1h", det:"Warm Goan bread three ways — Kiran picks the filling." },
-    { time:"10:30", type:"sight", title:"Panjim municipal market", location:"Panjim", dur:"1h", det:"Aai loose among the spice and banana-leaf stalls — budget accordingly." },
-    { time:"12:00", type:"sight", title:"Fontainhas walk", location:"Panjim Latin Quarter", dur:"1h 15m", det:"Ochre lanes and azulejo tiles — Priya's happy place." },
-    { time:"13:30", type:"meal", title:"Pure-veg Goan thali", location:"Panjim", dur:"1h", det:"The Aai-approved kitchen from the original plan." },
-    { time:"15:00", type:"meal", title:"Bakery finish", location:"Panjim", dur:"45m", det:"Bebinca, serradura and hot chai while the afternoon rain passes." }
-  ]);
-  return "Day 3 is now a market-and-food day: a poi breakfast crawl, Panjim's spice market for Aai, Fontainhas for Priya's camera, the trusted veg thali for lunch and a bakery finish for Kiran. Short hops, lots of awnings — very monsoon-proof.";
-}
-
-function dayWaterfall() {
-  setDay3("Spice trail & monsoon falls", "~80 km round trip inland — the falls only run in monsoon", [
-    { time:"08:00", type:"drive", title:"Early drive to the foothills", location:"Assagao → Ponda", dur:"1h", det:"Beat the day-trip buses to the farm gate." },
-    { time:"09:00", type:"activity", title:"Guided spice-farm trail", location:"Ponda", dur:"2h", det:"Covered walkways and flat paths — easy underfoot for Aai, elephants for Kiran." },
-    { time:"11:15", type:"activity", title:"Monsoon waterfall stop", location:"Ponda foothills", dur:"1h", det:"A short guided walk to falls that only exist in July — shallow splash zone for Kiran, tripod time for Priya." },
-    { time:"13:00", type:"meal", title:"Banana-leaf veg lunch", location:"At the spice farm", dur:"1h", det:"Included with the trail — all veg, all local." },
-    { time:"15:00", type:"drive", title:"Easy drive home", location:"Ponda → Assagao", dur:"1h", det:"Everyone naps except the driver. Sorry, Dhanjit." }
-  ]);
-  return "Day 3 is now a spice-trail-and-waterfall day: covered farm walkways that are easy on Aai, a July-only monsoon waterfall with a shallow splash zone for Kiran, and a banana-leaf veg lunch at the farm. Out early at 8, home by 4.";
-}
-
-function dayIsland() {
-  setDay3("Divar island loop", "~35 km plus two ferry hops — flat, quiet lanes", [
-    { time:"08:30", type:"drive", title:"Drive & ferry to Divar", location:"Ribandar jetty", dur:"45m", det:"Kiran's first car ferry — worth the trip on its own." },
-    { time:"09:30", type:"activity", title:"Island cycle loop", location:"Divar island", dur:"2h", det:"Flat paddy lanes with zero traffic; e-bikes for the grown-ups, Aai hops between stops by auto." },
-    { time:"12:00", type:"meal", title:"Village veg lunch", location:"Piedade, Divar", dur:"1h", det:"One family-run kitchen, thali of the day." },
-    { time:"13:30", type:"sight", title:"Piedade chapel viewpoint", location:"Divar island", dur:"45m", det:"The best Mandovi panorama in Goa — Priya's closing shot." },
-    { time:"14:30", type:"drive", title:"Ferry & drive home", location:"Divar → Assagao", dur:"45m", det:"Back with the whole evening to spare." }
-  ]);
-  return "Day 3 is now the Divar island loop: a car ferry (Kiran will talk about it for weeks), a flat zero-traffic cycle loop with e-bikes, an auto between stops for Aai, a village veg thali and the Piedade viewpoint for Priya. Home by mid-afternoon.";
-}
-
-function dayCafeView() {
-  setDay3("Clifftop cafes & a slow view day", "~40 km hopping a few viewpoints", [
-    { time:"09:30", type:"meal", title:"Hilltop breakfast cafe", location:"Chapora headland", dur:"1h 30m", det:"Glass windows over the river mouth — coffee for Priya, pancakes for Kiran, dry if it drizzles." },
-    { time:"11:30", type:"break", title:"Tea & stretch stop", location:"Anjuna", dur:"25m", det:"Aai's mid-morning break with a sea view." },
-    { time:"12:30", type:"sight", title:"Clifftop viewpoint", location:"Vagator cliffs", dur:"45m", det:"The red-earth cliffs — a five-minute photo stop between showers." },
-    { time:"13:30", type:"meal", title:"Garden veg lunch", location:"Assagao", dur:"1h 15m", det:"Covered courtyard cafe, pure-veg, mild for Kiran." },
-    { time:"15:00", type:"activity", title:"Pool & down time at the villa", location:"Assagao", dur:"2h", det:"Back at base to duck the afternoon showers before the evening cafe." },
-    { time:"17:30", type:"meal", title:"Sunset-view cafe", location:"Morjim riverside", dur:"1h 30m", det:"A deck over the water for the evening — Priya's golden hour, chai and cake for the rest." }
-  ]);
-  return "Day 3 is now a view-and-cafe day: a glass-walled hilltop breakfast, the Vagator cliffs for a quick photo stop, a covered garden lunch, a pool break to sit out the showers, and a riverside cafe for actual sunset — every stop has shelter, so the rain doesn't matter.";
-}
-
-function dayCliffPoint() {
-  setDay3("Clifftop viewpoints & sunset", "~50 km along the headlands", [
-    { time:"09:00", type:"meal", title:"Villa breakfast", location:"Assagao", dur:"1h", det:"Easy start — poi, fruit and coffee before the headlands." },
-    { time:"10:15", type:"sight", title:"Chapora fort headland", location:"Chapora", dur:"1h", det:"Wide river-mouth views; a short walk up, gentle enough for Aai." },
-    { time:"11:45", type:"break", title:"Tea & stretch stop", location:"Vagator", dur:"25m", det:"Aai's mid-morning break above the beach." },
-    { time:"12:45", type:"meal", title:"Cliffside veg lunch", location:"Anjuna", dur:"1h 15m", det:"Covered terrace over the rocks — pure-veg, mild for Kiran." },
-    { time:"14:30", type:"activity", title:"Pool & down time at the villa", location:"Assagao", dur:"2h 30m", det:"Back to base to sit out the afternoon heat and any shower." },
-    { time:"17:30", type:"sight", title:"Sea-cliff sunset point", location:"Vagator cliffs", dur:"1h 30m", det:"The red cliffs at last light — Priya's shot, and space for Kiran to run." }
-  ]);
-  return "Day 3 is now a viewpoint day: the Chapora headland in the morning, a cliffside veg lunch, an afternoon pool break to duck the heat, and the Vagator sea-cliffs for actual sunset. Short hops between headlands, with breaks in between for Aai.";
-}
-
-const TREE = {
-  root: { q: "Happy to! What kind of day should day 3 be?",
-    why: "Day 3 is wide open — weighing everyone's interests, the wet forecast, and that you're based in Assagao.",
-    options: [
-      { label: "Visit things", next: "visit" },
-      { label: "Chill at the stay", apply: dayChill },
-      { label: "Drive & chill", apply: dayDrive },
-      { label: "Trek or activities", next: "trek" }
-    ]},
-  visit: { q: "What kind of things?",
-    why: "Aai's after a temple, Priya's after photo light, Dhanjit likes history — all on the table.",
-    options: [
-      { label: "Temples & Old Goa", apply: dayTemples },
-      { label: "Forts & viewpoints", apply: dayForts },
-      { label: "Markets & food lanes", apply: dayMarkets },
-      { label: "Somewhere with a good view", next: "view" }
-    ]},
-  view: { q: "What kind of view spot?",
-    why: "Bright but showery this afternoon — the cafe's covered; the cliff point is a quick between-showers stop.",
-    options: [
-      { label: "Cafe with a good view", apply: dayCafeView },
-      { label: "Sea-cliff sunset point", apply: dayCliffPoint }
-    ]},
-  trek: { q: "How adventurous are we feeling?",
-    why: "It's monsoon, so I'm leaning toward things that still work in the rain.",
-    options: [
-      { label: "Waterfall & spice trail", apply: dayWaterfall },
-      { label: "Divar island cycle loop", apply: dayIsland }
-    ]}
-};
-
-function askNode(id) {
-  const node = TREE[id];
-  busy = true;
-  streamReply(node.q, () => {
-    const box = document.createElement("div");
-    box.className = "msg-opts";
-    if (node.why) {
-      const why = document.createElement("div");
-      why.className = "opts-why";
-      why.textContent = "Why these: " + node.why;
-      box.appendChild(why);
-    }
-    node.options.forEach(opt => {
-      const b = document.createElement("button");
-      b.className = "chip";
-      b.textContent = opt.label;
-      b.addEventListener("click", () => pick(box, b, opt));
-      box.appendChild(b);
-    });
-    $("msgs").appendChild(box);
-    $("msgs").scrollTop = $("msgs").scrollHeight;
-    if (document.activeElement === document.body) box.querySelector("button").focus();
-  });
-}
-
-function pick(box, btn, opt) {
-  if (busy || box.dataset.done) return;
-  box.dataset.done = "1";
-  busy = true;
-  box.querySelectorAll("button").forEach(b => { if (b !== btn) b.disabled = true; });
-  btn.classList.add("sel");
-  btn.setAttribute("aria-disabled", "true");
-  addMsg("user", opt.label);
-  setTimeout(() => {
-    if (opt.next) {
-      askNode(opt.next);
-    } else {
-      const reply = opt.apply();
-      renderItinerary([3]);
-      streamReply(reply, () => {
-        if (document.activeElement === document.body) $("chatInput").focus();
-      });
-    }
-  }, 650);
-}
-
-const PACK_REPLY = "For this group and a monsoon Konkan run: rain shells and a compact umbrella (Fontainhas walk), motion-sickness tablets for Kiran (30 min before the Kashedi ghat), Aai's medicines in the door pocket not the boot, sand toys and a change of clothes within reach for beach stops, a dry bag for Priya's camera, phone mounts and a charged power bank, FASTag topped up, and slip-on footwear — you'll be in and out of temples and wet sand all trip.";
-
-function closeOpenTree() {
-  document.querySelectorAll(".msg-opts").forEach(box => {
-    if (!box.dataset.done) {
-      box.dataset.done = "1";
-      box.querySelectorAll("button").forEach(b => { b.disabled = true; });
-    }
-  });
-}
-
-function respond(text) {
-  const q = text.toLowerCase();
-  if (!itin) {
-    streamReply("Hit “Plan my trip” first and I'll build the route — then I can change anything you like.");
-    return;
-  }
-  closeOpenTree();
-  let change = null, reply = null;
-  if (q.includes("relax") || q.includes("slow") || q.includes("easier")) { change = 2; reply = relaxDay2(); }
-  else if (q.includes("late") || q.includes("delay")) { change = 1; reply = runningLate(); }
-  else if (q.includes("rain") || q.includes("indoor") || q.includes("monsoon")) { change = 3; reply = rainyDay3(); }
-  else if (q.includes("pack")) { reply = PACK_REPLY; }
-  else if (q.includes("shape") || q.includes("guide") || q.includes("what should we do")) { askNode("root"); return; }
-  else {
-    reply = "In the live app I'd take that and rework the plan on the spot — this demo only simulates a few moves. Try the suggestion chips below: shape day 3 with a few quick questions, relax day 2, handle a 2-hour delay, rain-proof day 3, or ask what to pack.";
-  }
-  if (change) renderItinerary([change]);
-  streamReply(reply);
-}
-
-function send(text) {
-  const t = (text || "").trim();
-  if (!t || busy) return false;
-  busy = true;
-  addMsg("user", t);
-  setTimeout(() => respond(t), 650);
-  return true;
-}
-
-function sendFromInput() {
-  if (send($("chatInput").value)) $("chatInput").value = "";
-}
-
-$("itinerary").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-action='shape3']");
-  if (!b) return;
-  send("Help me shape day 3");
-});
-$("sendBtn").addEventListener("click", sendFromInput);
-$("chatInput").addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.isComposing && e.keyCode !== 229) sendFromInput();
-});
-document.querySelectorAll(".chip").forEach(c =>
-  c.addEventListener("click", () => send(c.dataset.q))
-);
-</script>
 </body>
 </html>
