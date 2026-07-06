@@ -51,7 +51,20 @@ lib/itinerary-schema.ts    THE shared JSON schema (see invariant below)
 lib/prompts.ts             System prompts; traveler context injection
 lib/types.ts               TS types mirroring the schema
 site/index.html            Self-contained static mockup (simulated planning/chat)
+docs/agentic-choices.md    Design doc: guided, context-aware decision flow (next big feature)
 ```
+
+## Where this is going
+
+The next feature is **agentic choices** — the companion offers the next
+decision as a small set of choices that narrow toward a change, and the option
+set itself is model-generated from context (traveler interests, mood, time of
+day, weather, location). Read [docs/agentic-choices.md](docs/agentic-choices.md)
+before touching the decision-tree code or the chat route. The mockup already
+demonstrates the interaction (`TREE`/`askNode`/`pick` in `site/index.html`);
+the real-app plan (a `suggest_options` tool + `{type:"options"}` event) is in
+that doc. Built by Dhanjit with Ganeshan — keep the doc current as the shared
+source of truth.
 
 ### Invariants
 

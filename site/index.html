@@ -183,6 +183,14 @@
     font-size: 11.5px; font-weight: 700; border-radius: 8px; padding: 2px 8px; margin-right: 8px;
   }
   .day-head h3 { display: inline; font-size: 14.5px; margin: 0; }
+  .day-head-right { display: flex; align-items: center; gap: 10px; }
+  .day-action {
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    background: var(--accent-soft); color: var(--accent);
+    font: inherit; font-size: 11.5px; font-weight: 600;
+    border-radius: 999px; padding: 3px 10px; cursor: pointer;
+  }
+  .day-action:hover { filter: brightness(0.97); }
   .day-date { font-size: 11.5px; color: var(--faint); }
   .drive-sum { font-size: 12.5px; color: var(--muted); margin: 4px 0 12px; }
 
@@ -234,6 +242,7 @@
   .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; }
   .chips[hidden] { display: none; }
   .msg-opts { display: flex; flex-wrap: wrap; gap: 6px; max-width: 88%; align-self: flex-start; }
+  .opts-why { flex-basis: 100%; font-size: 11.5px; color: var(--faint); font-style: italic; margin-bottom: 2px; }
   .msg-opts .chip[disabled] { opacity: 0.55; cursor: default; }
   .msg-opts .chip[disabled]:hover { border-color: var(--line); color: var(--muted); }
   .msg-opts .chip.sel {
@@ -454,7 +463,10 @@ function renderItinerary(highlightDays) {
         <section class="card pad ${hl.has(d.day) ? "flash" : ""}">
           <div class="day-head">
             <div><span class="day-pill">Day ${d.day}</span><h3>${esc(d.title)}</h3></div>
-            <span class="day-date mono">${esc(d.date)}</span>
+            <div class="day-head-right">
+              <span class="day-date mono">${esc(d.date)}</span>
+              ${d.day === 3 ? `<button class="day-action" type="button" data-action="shape3">Shape this day →</button>` : ""}
+            </div>
           </div>
           ${d.driveSummary ? `<div class="drive-sum">🛣️ ${esc(d.driveSummary)}</div>` : ""}
           <div>
@@ -679,22 +691,59 @@ function dayIsland() {
   return "Day 3 is now the Divar island loop: a car ferry (Kiran will talk about it for weeks), a flat zero-traffic cycle loop with e-bikes, an auto between stops for Aai, a village veg thali and the Piedade viewpoint for Priya. Home by mid-afternoon.";
 }
 
+function dayCafeView() {
+  setDay3("Clifftop cafes & a slow view day", "~40 km hopping a few viewpoints", [
+    { time:"09:30", type:"meal", title:"Hilltop breakfast cafe", location:"Chapora headland", dur:"1h 30m", det:"Glass windows over the river mouth — coffee for Priya, pancakes for Kiran, dry if it drizzles." },
+    { time:"11:30", type:"break", title:"Tea & stretch stop", location:"Anjuna", dur:"25m", det:"Aai's mid-morning break with a sea view." },
+    { time:"12:30", type:"sight", title:"Clifftop viewpoint", location:"Vagator cliffs", dur:"45m", det:"The red-earth cliffs — a five-minute photo stop between showers." },
+    { time:"13:30", type:"meal", title:"Garden veg lunch", location:"Assagao", dur:"1h 15m", det:"Covered courtyard cafe, pure-veg, mild for Kiran." },
+    { time:"15:00", type:"activity", title:"Pool & down time at the villa", location:"Assagao", dur:"2h", det:"Back at base to duck the afternoon showers before the evening cafe." },
+    { time:"17:30", type:"meal", title:"Sunset-view cafe", location:"Morjim riverside", dur:"1h 30m", det:"A deck over the water for the evening — Priya's golden hour, chai and cake for the rest." }
+  ]);
+  return "Day 3 is now a view-and-cafe day: a glass-walled hilltop breakfast, the Vagator cliffs for a quick photo stop, a covered garden lunch, a pool break to sit out the showers, and a riverside cafe for actual sunset — every stop has shelter, so the rain doesn't matter.";
+}
+
+function dayCliffPoint() {
+  setDay3("Clifftop viewpoints & sunset", "~50 km along the headlands", [
+    { time:"09:00", type:"meal", title:"Villa breakfast", location:"Assagao", dur:"1h", det:"Easy start — poi, fruit and coffee before the headlands." },
+    { time:"10:15", type:"sight", title:"Chapora fort headland", location:"Chapora", dur:"1h", det:"Wide river-mouth views; a short walk up, gentle enough for Aai." },
+    { time:"11:45", type:"break", title:"Tea & stretch stop", location:"Vagator", dur:"25m", det:"Aai's mid-morning break above the beach." },
+    { time:"12:45", type:"meal", title:"Cliffside veg lunch", location:"Anjuna", dur:"1h 15m", det:"Covered terrace over the rocks — pure-veg, mild for Kiran." },
+    { time:"14:30", type:"activity", title:"Pool & down time at the villa", location:"Assagao", dur:"2h 30m", det:"Back to base to sit out the afternoon heat and any shower." },
+    { time:"17:30", type:"sight", title:"Sea-cliff sunset point", location:"Vagator cliffs", dur:"1h 30m", det:"The red cliffs at last light — Priya's shot, and space for Kiran to run." }
+  ]);
+  return "Day 3 is now a viewpoint day: the Chapora headland in the morning, a cliffside veg lunch, an afternoon pool break to duck the heat, and the Vagator sea-cliffs for actual sunset. Short hops between headlands, with breaks in between for Aai.";
+}
+
 const TREE = {
-  root: { q: "Happy to! What kind of day should day 3 be?", options: [
-    { label: "Visit things", next: "visit" },
-    { label: "Chill at the stay", apply: dayChill },
-    { label: "Drive & chill", apply: dayDrive },
-    { label: "Trek or activities", next: "trek" }
-  ]},
-  visit: { q: "What kind of things?", options: [
-    { label: "Temples & Old Goa", apply: dayTemples },
-    { label: "Forts & viewpoints", apply: dayForts },
-    { label: "Markets & food lanes", apply: dayMarkets }
-  ]},
-  trek: { q: "How adventurous are we feeling?", options: [
-    { label: "Waterfall & spice trail", apply: dayWaterfall },
-    { label: "Divar island cycle loop", apply: dayIsland }
-  ]}
+  root: { q: "Happy to! What kind of day should day 3 be?",
+    why: "Day 3 is wide open — weighing everyone's interests, the wet forecast, and that you're based in Assagao.",
+    options: [
+      { label: "Visit things", next: "visit" },
+      { label: "Chill at the stay", apply: dayChill },
+      { label: "Drive & chill", apply: dayDrive },
+      { label: "Trek or activities", next: "trek" }
+    ]},
+  visit: { q: "What kind of things?",
+    why: "Aai's after a temple, Priya's after photo light, Dhanjit likes history — all on the table.",
+    options: [
+      { label: "Temples & Old Goa", apply: dayTemples },
+      { label: "Forts & viewpoints", apply: dayForts },
+      { label: "Markets & food lanes", apply: dayMarkets },
+      { label: "Somewhere with a good view", next: "view" }
+    ]},
+  view: { q: "What kind of view spot?",
+    why: "Bright but showery this afternoon — the cafe's covered; the cliff point is a quick between-showers stop.",
+    options: [
+      { label: "Cafe with a good view", apply: dayCafeView },
+      { label: "Sea-cliff sunset point", apply: dayCliffPoint }
+    ]},
+  trek: { q: "How adventurous are we feeling?",
+    why: "It's monsoon, so I'm leaning toward things that still work in the rain.",
+    options: [
+      { label: "Waterfall & spice trail", apply: dayWaterfall },
+      { label: "Divar island cycle loop", apply: dayIsland }
+    ]}
 };
 
 function askNode(id) {
@@ -703,6 +752,12 @@ function askNode(id) {
   streamReply(node.q, () => {
     const box = document.createElement("div");
     box.className = "msg-opts";
+    if (node.why) {
+      const why = document.createElement("div");
+      why.className = "opts-why";
+      why.textContent = "Why these: " + node.why;
+      box.appendChild(why);
+    }
     node.options.forEach(opt => {
       const b = document.createElement("button");
       b.className = "chip";
@@ -720,7 +775,7 @@ function pick(box, btn, opt) {
   if (busy || box.dataset.done) return;
   box.dataset.done = "1";
   busy = true;
-  [...box.children].forEach(b => { if (b !== btn) b.disabled = true; });
+  box.querySelectorAll("button").forEach(b => { if (b !== btn) b.disabled = true; });
   btn.classList.add("sel");
   btn.setAttribute("aria-disabled", "true");
   addMsg("user", opt.label);
@@ -739,12 +794,22 @@ function pick(box, btn, opt) {
 
 const PACK_REPLY = "For this group and a monsoon Konkan run: rain shells and a compact umbrella (Fontainhas walk), motion-sickness tablets for Kiran (30 min before the Kashedi ghat), Aai's medicines in the door pocket not the boot, sand toys and a change of clothes within reach for beach stops, a dry bag for Priya's camera, phone mounts and a charged power bank, FASTag topped up, and slip-on footwear — you'll be in and out of temples and wet sand all trip.";
 
+function closeOpenTree() {
+  document.querySelectorAll(".msg-opts").forEach(box => {
+    if (!box.dataset.done) {
+      box.dataset.done = "1";
+      box.querySelectorAll("button").forEach(b => { b.disabled = true; });
+    }
+  });
+}
+
 function respond(text) {
   const q = text.toLowerCase();
   if (!itin) {
     streamReply("Hit “Plan my trip” first and I'll build the route — then I can change anything you like.");
     return;
   }
+  closeOpenTree();
   let change = null, reply = null;
   if (q.includes("relax") || q.includes("slow") || q.includes("easier")) { change = 2; reply = relaxDay2(); }
   else if (q.includes("late") || q.includes("delay")) { change = 1; reply = runningLate(); }
@@ -771,6 +836,11 @@ function sendFromInput() {
   if (send($("chatInput").value)) $("chatInput").value = "";
 }
 
+$("itinerary").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-action='shape3']");
+  if (!b) return;
+  send("Help me shape day 3");
+});
 $("sendBtn").addEventListener("click", sendFromInput);
 $("chatInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.isComposing && e.keyCode !== 229) sendFromInput();
