@@ -12,3 +12,7 @@ often:
    parked in `wrangler.opennext.jsonc`.
 2. The itinerary JSON schema (`lib/itinerary-schema.ts`), the TS types
    (`lib/types.ts`), and the UI renderer must change together.
+
+The next feature (guided, context-aware choices) has a design doc:
+[docs/agentic-choices.md](./docs/agentic-choices.md) — read it before working
+on the decision-tree flow or the chat route.
