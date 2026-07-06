@@ -233,6 +233,14 @@
 
   .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; }
   .chips[hidden] { display: none; }
+  .msg-opts { display: flex; flex-wrap: wrap; gap: 6px; max-width: 88%; align-self: flex-start; }
+  .msg-opts .chip[disabled] { opacity: 0.55; cursor: default; }
+  .msg-opts .chip[disabled]:hover { border-color: var(--line); color: var(--muted); }
+  .msg-opts .chip.sel {
+    border-color: var(--accent); color: var(--accent);
+    background: var(--accent-soft); opacity: 1; cursor: default;
+  }
+  .msg-opts .chip.sel:hover { border-color: var(--accent); color: var(--accent); }
   .chip {
     border: 1px solid var(--line); background: var(--card-2); color: var(--muted);
     font: inherit; font-size: 12px; border-radius: 999px; padding: 4px 11px; cursor: pointer;
@@ -343,6 +351,7 @@
       </header>
       <div class="msgs" id="msgs" role="log" aria-label="Conversation"></div>
       <div class="chips" id="chips" hidden>
+        <button class="chip" data-q="Help me shape day 3">Shape day 3</button>
         <button class="chip" data-q="Make day 2 more relaxed">Make day 2 more relaxed</button>
         <button class="chip" data-q="We're running 2 hours late">We're running 2 hours late</button>
         <button class="chip" data-q="Rain forecast — make day 3 indoors">Rain on day 3</button>
@@ -570,14 +579,162 @@ function rainyDay3() {
   const d = itin.days[2];
   d.title = "North Goa, monsoon-proofed";
   d.stops = [
-    d.stops[0],
+    { time:"08:30", type:"meal", title:"Cafe breakfast", location:"Assagao", dur:"1h", det:"Good coffee for Priya, veg Goan poi sandwiches, banana pancakes for Kiran." },
     { time:"10:00", type:"sight", title:"Museum of Goa", location:"Pilerne", dur:"1h 30m", det:"Big, playful contemporary art space — genuinely fun for Kiran, dry for everyone." },
     { time:"12:00", type:"activity", title:"Spice farm tour & lunch", location:"Ponda", dur:"2h 30m", det:"Covered walkways, elephant sightings, and a banana-leaf veg lunch included — Aai's kind of afternoon." },
     { time:"15:30", type:"sight", title:"Fontainhas walk, umbrellas up", location:"Panjim Latin Quarter", dur:"1h", det:"The ochre walls photograph even better wet — Priya wins either way." },
     { time:"17:00", type:"meal", title:"Bakery stop & early dinner", location:"Panjim", dur:"1h 15m", det:"Bebinca and hot chai while the rain does its thing." }
   ];
   d.driveSummary = "~85 km loop via Pilerne, Ponda & Panjim — all-weather roads";
-  return "Day 3 is now rain-ready: Fort Aguada and beach time swap out for the Museum of Goa and a covered spice-farm tour with a veg lunch at Ponda. Kept the Fontainhas walk — it's better in the rain, and Priya's photos will thank you. If the sky clears by 5, we can still sneak in Miramar sunset.";
+  return "Day 3 is now rain-ready: the outdoor stops swap out for the Museum of Goa and a covered spice-farm tour with a veg lunch at Ponda, plus the Fontainhas walk — it's better in the rain, and Priya's photos will thank you. If the sky clears by 5, we can still sneak in Miramar sunset.";
+}
+
+/* ---------- day-3 decision tree ---------- */
+function setDay3(title, driveSummary, stops) {
+  const d = itin.days[2];
+  d.title = title;
+  d.driveSummary = driveSummary;
+  d.stops = stops;
+}
+
+function dayChill() {
+  setDay3("North Goa, villa day", "No driving today — the car stays parked", [
+    { time:"09:00", type:"meal", title:"Slow villa brunch", location:"Assagao", dur:"1h", det:"Banana pancakes for Kiran, a second pot of coffee for Priya — nobody checks the clock." },
+    { time:"10:30", type:"activity", title:"Pool & board games", location:"At the villa", dur:"2h", det:"Kiran in the pool, Aai refereeing carrom from the shaded verandah." },
+    { time:"13:00", type:"meal", title:"Home-style veg lunch", location:"Assagao lane cafe", dur:"1h", det:"Two minutes' walk — dal, rice and bhindi, nothing fancy on purpose." },
+    { time:"14:30", type:"break", title:"Nap & reading hour", location:"At the villa", dur:"1h 30m", det:"Monsoon rain on the roof is the whole point." },
+    { time:"17:00", type:"activity", title:"Evening lane walk", location:"Assagao", dur:"1h", det:"Old Portuguese houses and paddy views if the sky holds — Priya's golden hour." }
+  ]);
+  return "Done — day 3 is now a proper villa day. Nobody gets in the car: pool and carrom in the morning, a two-minute-walk lunch, a rain-on-the-roof nap hour, and an easy lane walk at golden hour. Everyone recharges before the drive home.";
+}
+
+function dayDrive() {
+  setDay3("North Goa, windows-down loop", "~45 km lazy coastal loop — no leg over 45 minutes", [
+    { time:"09:30", type:"drive", title:"Coastal cruise north", location:"Assagao → Morjim", dur:"45m", det:"Easy monsoon-green backroads, music on." },
+    { time:"10:15", type:"activity", title:"Morjim beach walk", location:"Morjim", dur:"1h", det:"The quiet turtle beach — Kiran runs, everyone else strolls." },
+    { time:"11:30", type:"break", title:"Beach-shack chai", location:"Morjim", dur:"30m", det:"Aai's stretch break with a sea view." },
+    { time:"12:15", type:"drive", title:"Chapora river loop", location:"Morjim → Siolim", dur:"45m", det:"Ferry-road views over the river — Priya shoots from the window." },
+    { time:"13:00", type:"meal", title:"Veg thali lunch", location:"Siolim", dur:"1h", det:"Pure-veg kitchen, mild for Kiran." },
+    { time:"14:30", type:"activity", title:"Pool & down time at the villa", location:"Assagao", dur:"3h", det:"The loop passes home anyway — Kiran swims off the car miles while the sun drops." },
+    { time:"18:00", type:"activity", title:"Chapora fort sunset", location:"Vagator", dur:"1h", det:"Short climb, big monsoon sky — the classic finish." }
+  ]);
+  return "Day 3 is now a windows-down day: a lazy 45-km coastal loop with Morjim beach, chai for Aai's break, river views for Priya, a long pool stop at the villa, and the Chapora fort sunset to finish. No single stretch over 45 minutes, so Kiran's stomach stays happy.";
+}
+
+function dayTemples() {
+  setDay3("Temples & Old Goa", "~70 km loop via Ponda & Old Goa", [
+    { time:"08:30", type:"drive", title:"Drive inland to Ponda", location:"Assagao → Ponda", dur:"1h", det:"Out before the market traffic." },
+    { time:"09:30", type:"sight", title:"Shri Mangeshi Temple", location:"Ponda", dur:"1h", det:"Aai's darshan — 18th-century temple with the famous seven-storey lamp tower." },
+    { time:"11:00", type:"break", title:"Chai & stretch stop", location:"Ponda", dur:"25m", det:"Right on Aai's two-hour rhythm." },
+    { time:"12:00", type:"meal", title:"Veg thali lunch", location:"Ponda", dur:"1h", det:"Temple-town kitchens are reliably pure-veg." },
+    { time:"13:30", type:"sight", title:"Basilica of Bom Jesus & Se Cathedral", location:"Old Goa", dur:"1h 30m", det:"Dhanjit's history fix — 400-year-old churches, UNESCO listed." },
+    { time:"15:30", type:"drive", title:"River road home", location:"Ribandar causeway", dur:"45m", det:"Mandovi views the whole way — camera stays out." }
+  ]);
+  return "Day 3 is now a temples-and-history day: Mangeshi Temple for Aai's darshan, a pure-veg temple-town lunch, then Old Goa's basilicas for Dhanjit, home along the Ribandar causeway for Priya's river shots. Breaks land on Aai's two-hour rhythm.";
+}
+
+function dayForts() {
+  setDay3("Forts & viewpoints", "~55 km fort-hop along the coast", [
+    { time:"09:00", type:"sight", title:"Fort Aguada & lighthouse", location:"Candolim", dur:"1h 15m", det:"The big one — ramparts, lighthouse, monsoon horizon." },
+    { time:"10:30", type:"break", title:"Chai & stretch stop", location:"Sinquerim", dur:"25m", det:"Aai's break before the next climb." },
+    { time:"11:15", type:"sight", title:"Reis Magos fort", location:"Verem", dur:"1h", det:"Smaller and kid-friendly — Kiran can actually run the walls here." },
+    { time:"13:00", type:"meal", title:"Pure-veg Goan lunch", location:"Panjim", dur:"1h", det:"Khatkhate and solkadhi near the church square." },
+    { time:"14:30", type:"activity", title:"Miramar beach & chai", location:"Miramar", dur:"2h", det:"Flat sand near Panjim — recovery time between forts for Aai and Kiran." },
+    { time:"17:15", type:"drive", title:"Coast road to Vagator", location:"Miramar → Vagator", dur:"45m", det:"One last windows-down stretch as the light turns." },
+    { time:"18:00", type:"sight", title:"Chapora fort sunset", location:"Vagator", dur:"1h", det:"Save the most photogenic ramparts for last light." }
+  ]);
+  return "Day 3 is now a fort-hop: Aguada's lighthouse first, Reis Magos where Kiran can run the walls, a veg lunch in Panjim, beach recovery time at Miramar, and Chapora saved for actual sunset. Three forts, all short climbs, breaks in between for Aai.";
+}
+
+function dayMarkets() {
+  setDay3("Markets & food lanes", "~30 km of hops — most of the day is on foot", [
+    { time:"09:00", type:"meal", title:"Poi-sandwich breakfast crawl", location:"Assagao", dur:"1h", det:"Warm Goan bread three ways — Kiran picks the filling." },
+    { time:"10:30", type:"sight", title:"Panjim municipal market", location:"Panjim", dur:"1h", det:"Aai loose among the spice and banana-leaf stalls — budget accordingly." },
+    { time:"12:00", type:"sight", title:"Fontainhas walk", location:"Panjim Latin Quarter", dur:"1h 15m", det:"Ochre lanes and azulejo tiles — Priya's happy place." },
+    { time:"13:30", type:"meal", title:"Pure-veg Goan thali", location:"Panjim", dur:"1h", det:"The Aai-approved kitchen from the original plan." },
+    { time:"15:00", type:"meal", title:"Bakery finish", location:"Panjim", dur:"45m", det:"Bebinca, serradura and hot chai while the afternoon rain passes." }
+  ]);
+  return "Day 3 is now a market-and-food day: a poi breakfast crawl, Panjim's spice market for Aai, Fontainhas for Priya's camera, the trusted veg thali for lunch and a bakery finish for Kiran. Short hops, lots of awnings — very monsoon-proof.";
+}
+
+function dayWaterfall() {
+  setDay3("Spice trail & monsoon falls", "~80 km round trip inland — the falls only run in monsoon", [
+    { time:"08:00", type:"drive", title:"Early drive to the foothills", location:"Assagao → Ponda", dur:"1h", det:"Beat the day-trip buses to the farm gate." },
+    { time:"09:00", type:"activity", title:"Guided spice-farm trail", location:"Ponda", dur:"2h", det:"Covered walkways and flat paths — easy underfoot for Aai, elephants for Kiran." },
+    { time:"11:15", type:"activity", title:"Monsoon waterfall stop", location:"Ponda foothills", dur:"1h", det:"A short guided walk to falls that only exist in July — shallow splash zone for Kiran, tripod time for Priya." },
+    { time:"13:00", type:"meal", title:"Banana-leaf veg lunch", location:"At the spice farm", dur:"1h", det:"Included with the trail — all veg, all local." },
+    { time:"15:00", type:"drive", title:"Easy drive home", location:"Ponda → Assagao", dur:"1h", det:"Everyone naps except the driver. Sorry, Dhanjit." }
+  ]);
+  return "Day 3 is now a spice-trail-and-waterfall day: covered farm walkways that are easy on Aai, a July-only monsoon waterfall with a shallow splash zone for Kiran, and a banana-leaf veg lunch at the farm. Out early at 8, home by 4.";
+}
+
+function dayIsland() {
+  setDay3("Divar island loop", "~35 km plus two ferry hops — flat, quiet lanes", [
+    { time:"08:30", type:"drive", title:"Drive & ferry to Divar", location:"Ribandar jetty", dur:"45m", det:"Kiran's first car ferry — worth the trip on its own." },
+    { time:"09:30", type:"activity", title:"Island cycle loop", location:"Divar island", dur:"2h", det:"Flat paddy lanes with zero traffic; e-bikes for the grown-ups, Aai hops between stops by auto." },
+    { time:"12:00", type:"meal", title:"Village veg lunch", location:"Piedade, Divar", dur:"1h", det:"One family-run kitchen, thali of the day." },
+    { time:"13:30", type:"sight", title:"Piedade chapel viewpoint", location:"Divar island", dur:"45m", det:"The best Mandovi panorama in Goa — Priya's closing shot." },
+    { time:"14:30", type:"drive", title:"Ferry & drive home", location:"Divar → Assagao", dur:"45m", det:"Back with the whole evening to spare." }
+  ]);
+  return "Day 3 is now the Divar island loop: a car ferry (Kiran will talk about it for weeks), a flat zero-traffic cycle loop with e-bikes, an auto between stops for Aai, a village veg thali and the Piedade viewpoint for Priya. Home by mid-afternoon.";
+}
+
+const TREE = {
+  root: { q: "Happy to! What kind of day should day 3 be?", options: [
+    { label: "Visit things", next: "visit" },
+    { label: "Chill at the stay", apply: dayChill },
+    { label: "Drive & chill", apply: dayDrive },
+    { label: "Trek or activities", next: "trek" }
+  ]},
+  visit: { q: "What kind of things?", options: [
+    { label: "Temples & Old Goa", apply: dayTemples },
+    { label: "Forts & viewpoints", apply: dayForts },
+    { label: "Markets & food lanes", apply: dayMarkets }
+  ]},
+  trek: { q: "How adventurous are we feeling?", options: [
+    { label: "Waterfall & spice trail", apply: dayWaterfall },
+    { label: "Divar island cycle loop", apply: dayIsland }
+  ]}
+};
+
+function askNode(id) {
+  const node = TREE[id];
+  busy = true;
+  streamReply(node.q, () => {
+    const box = document.createElement("div");
+    box.className = "msg-opts";
+    node.options.forEach(opt => {
+      const b = document.createElement("button");
+      b.className = "chip";
+      b.textContent = opt.label;
+      b.addEventListener("click", () => pick(box, b, opt));
+      box.appendChild(b);
+    });
+    $("msgs").appendChild(box);
+    $("msgs").scrollTop = $("msgs").scrollHeight;
+    if (document.activeElement === document.body) box.querySelector("button").focus();
+  });
+}
+
+function pick(box, btn, opt) {
+  if (busy || box.dataset.done) return;
+  box.dataset.done = "1";
+  busy = true;
+  [...box.children].forEach(b => { if (b !== btn) b.disabled = true; });
+  btn.classList.add("sel");
+  btn.setAttribute("aria-disabled", "true");
+  addMsg("user", opt.label);
+  setTimeout(() => {
+    if (opt.next) {
+      askNode(opt.next);
+    } else {
+      const reply = opt.apply();
+      renderItinerary([3]);
+      streamReply(reply, () => {
+        if (document.activeElement === document.body) $("chatInput").focus();
+      });
+    }
+  }, 650);
 }
 
 const PACK_REPLY = "For this group and a monsoon Konkan run: rain shells and a compact umbrella (Fontainhas walk), motion-sickness tablets for Kiran (30 min before the Kashedi ghat), Aai's medicines in the door pocket not the boot, sand toys and a change of clothes within reach for beach stops, a dry bag for Priya's camera, phone mounts and a charged power bank, FASTag topped up, and slip-on footwear — you'll be in and out of temples and wet sand all trip.";
@@ -593,8 +750,9 @@ function respond(text) {
   else if (q.includes("late") || q.includes("delay")) { change = 1; reply = runningLate(); }
   else if (q.includes("rain") || q.includes("indoor") || q.includes("monsoon")) { change = 3; reply = rainyDay3(); }
   else if (q.includes("pack")) { reply = PACK_REPLY; }
+  else if (q.includes("shape") || q.includes("guide") || q.includes("what should we do")) { askNode("root"); return; }
   else {
-    reply = "In the live app I'd take that and rework the plan on the spot — this demo only simulates a few moves. Try the suggestion chips below: relax day 2, handle a 2-hour delay, rain-proof day 3, or ask what to pack.";
+    reply = "In the live app I'd take that and rework the plan on the spot — this demo only simulates a few moves. Try the suggestion chips below: shape day 3 with a few quick questions, relax day 2, handle a 2-hour delay, rain-proof day 3, or ask what to pack.";
   }
   if (change) renderItinerary([change]);
   streamReply(reply);
