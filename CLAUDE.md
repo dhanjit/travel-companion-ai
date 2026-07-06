@@ -16,7 +16,7 @@ The repo has **two deployment modes**, switched by `wrangler.jsonc`:
 
 | Mode | Config | What deploys |
 |---|---|---|
-| **Mockup (current)** | `wrangler.jsonc` → `assets.directory: ./site` | Static demo `site/index.html` only. No build, no API key. Live at https://humsafar.dhanjit.me |
+| **Mockup (current)** | `wrangler.jsonc` → `assets.directory: ./site` | Static landing (`site/index.html`) + interactive demo (`site/demo/index.html`, served at `/demo`). No build, no API key. Live at https://humsafar.dhanjit.me |
 | **Real app (parked)** | `wrangler.opennext.jsonc` | Full Next.js app on Workers via OpenNext. Requires the `ANTHROPIC_API_KEY` secret on the Worker. |
 
 To go live with the real app: copy `wrangler.opennext.jsonc` over
@@ -50,7 +50,8 @@ app/api/chat/route.ts      POST — streaming agentic loop with update_itinerary
 lib/itinerary-schema.ts    THE shared JSON schema (see invariant below)
 lib/prompts.ts             System prompts; traveler context injection
 lib/types.ts               TS types mirroring the schema
-site/index.html            Self-contained static mockup (simulated planning/chat)
+site/index.html            Static landing page (links to /demo)
+site/demo/index.html       Self-contained interactive mockup (simulated planning/chat)
 docs/agentic-choices.md    Design doc: guided, context-aware decision flow (next big feature)
 ```
 
@@ -61,9 +62,9 @@ decision as a small set of choices that narrow toward a change, and the option
 set itself is model-generated from context (traveler interests, mood, time of
 day, weather, location). Read [docs/agentic-choices.md](docs/agentic-choices.md)
 before touching the decision-tree code or the chat route. The mockup already
-demonstrates the interaction (`TREE`/`askNode`/`pick` in `site/index.html`);
-the real-app plan (a `suggest_options` tool + `{type:"options"}` event) is in
-that doc. Built by Dhanjit with Ganeshan — keep the doc current as the shared
+demonstrates the interaction (`TREE`/`askNode`/`pick` + the `CTX` context engine
+in `site/demo/index.html`); the real-app plan (a `suggest_options` tool +
+`{type:"options"}` event) is in that doc. Built by Dhanjit with Ganeshan — keep the doc current as the shared
 source of truth.
 
 ### Invariants
@@ -83,9 +84,11 @@ source of truth.
    chat route; check `stop_reason` (`refusal`, `pause_turn`, `max_tokens`,
    `tool_use`) before reading content. Use the SDK's typed errors
    (`Anthropic.RateLimitError` etc.), not string matching.
-4. **The mockup is standalone.** `site/index.html` has zero dependencies and
-   makes zero network calls (simulated responses only). Keep it that way —
-   it must work with no key and no backend.
+4. **The mockup is standalone.** Both `site/index.html` (landing) and
+   `site/demo/index.html` (demo) have zero dependencies and make zero network
+   calls (simulated responses only). Keep them that way — they must work with
+   no key and no backend. The only cross-page link is the landing's `/demo`
+   link and the demo's `/` back-link.
 
 ## Environment
 

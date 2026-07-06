@@ -162,11 +162,11 @@ choices is new, and it's a leaf tool the model opts into.
 
 ## Mockup vs real app
 
-| | Mockup (`site/index.html`) | Real app |
+| | Mockup (`site/demo/index.html`) | Real app |
 |---|---|---|
-| Option sets | hardcoded `TREE` + leaf functions | model-generated via `suggest_options` |
-| "Why these" line | static per node | generated from real context |
-| Context signals | simulated (a wet-afternoon flavor) | live: profiles, weather, time, location |
+| Option sets | hardcoded `TREE` + leaf functions, **re-ranked/annotated by a simulated context** | model-generated via `suggest_options` |
+| "Why these" line | generated from the simulated `CTX` | generated from real context |
+| Context signals | simulated, **user-toggleable** (weather / time / energy) | live: profiles, weather, time, location |
 | Applying a change | mutate the JS itinerary object | `update_itinerary` tool |
 | Network | **none — stays standalone** | Claude API + signal providers |
 
@@ -176,26 +176,36 @@ into the mockup — prototype those in the Next.js app.
 
 ## How the mockup demonstrates it today
 
-In `site/index.html`:
+In `site/demo/index.html`:
 
-- `TREE` — the node graph: `root` → (`visit` → `view`) / (`trek`) branches, plus
-  direct leaves. Each node carries a `why` line rendered above the options.
-- `askNode(id)` / `pick(box, btn, opt)` — render a question + option chips,
-  handle a pick (drill to `next` or run a leaf's `apply`), keep the trail
-  visible, manage focus.
+- `CTX` — a simulated context (`weather` / `time` / `energy`), exposed as the
+  **"Right now"** toggle strip in the chat. Changing it re-ranks and re-annotates
+  the open question's options live — the visible stand-in for "the model chose
+  these because of the moment".
+- `scoreOption` / `optionNote` — order options and add notes ("better if it
+  clears", "ambitious right now") from `CTX`. Category options (that lead to
+  another question) stay put; strongly-mismatched leaves dim.
+- `TREE` — the node graph: `root` → `visit` → (`popular` / `view` / `offbeat`),
+  plus direct leaves. Each node's `why()` and `trail` render above the options.
+- `openQuestion` / `askNode(id)` / `pick(box, btn, opt)` — stream a question,
+  render options via `renderOptions`, handle a pick (drill to `next` or run a
+  leaf's `apply`), keep the trail visible, manage focus.
 - `day*()` leaf functions (`dayChill`, `dayDrive`, `dayTemples`, `dayForts`,
-  `dayMarkets`, `dayWaterfall`, `dayIsland`, `dayCafeView`) — each rewrites day
-  3 and returns the companion's explanation.
-- `data-action="shape3"` button on the day-3 card — the moment-level entry:
-  drilling in from the trip view itself.
+  `dayMarkets`, `dayWaterfall`, `dayIsland`, `dayCafeView`, `dayCliffPoint`) —
+  each rewrites day 3 and returns the companion's explanation.
+- Two entry points: the **"Shape this day →"** button on the day-3 card
+  (`data-action="shape3"`), and **"what next here?"** on every stop
+  (`data-action="next"` → `whatNextHere` → `momentNode`), which builds a
+  context-aware question anchored to that stop and inserts a fitting stop.
 
 The narrowing chain the user asked for is live:
-`Visit things → Somewhere with a good view → Cafe with a good view`.
+`Visit things → Somewhere with a good view → Cafe with a good view`, and the
+choices visibly change when you flip the context toggles.
 
 ## Next steps
 
-- [ ] Mockup: add the moment-level "what next here?" entry on an individual
-      _stop_, not just the day card.
+- [x] Mockup: moment-level "what next here?" on individual stops (done).
+- [x] Mockup: choices that visibly shift with context (weather/time/energy).
 - [ ] Real app: implement `suggest_options` tool + `{type:"options"}` event;
       port the mockup's option-box UI into a React component.
 - [ ] Decide the _Open_ items above (signals/providers, provider seam,
