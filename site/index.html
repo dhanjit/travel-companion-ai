@@ -9,7 +9,7 @@
   :root {
     --bg: #faf8f4; --card: #ffffff; --card-2: #f5f2ec; --ink: #1c1917;
     --muted: #6f675f; --faint: #766e66; --line: #e7e2da;
-    --accent: #c86a15; --accent-soft: #f7e8d8; --accent-ink: #ffffff;
+    --accent: #c86a15; --accent-soft: #f7e8d8; --accent-ink: #ffffff; --accent-text: #9c5412;
     --demo: #2f7d4f; --demo-soft: #e2f0e7;
     --shadow: 0 1px 3px rgba(28,25,23,0.06);
     color-scheme: light dark;
@@ -18,7 +18,7 @@
     :root {
       --bg: #161412; --card: #211e1b; --card-2: #2a2622; --ink: #e8e4df;
       --muted: #a39a91; --faint: #8d857c; --line: #383329;
-      --accent: #f0a24b; --accent-soft: #3a2c1a; --accent-ink: #1c1409;
+      --accent: #f0a24b; --accent-soft: #3a2c1a; --accent-ink: #1c1409; --accent-text: #f0a24b;
       --demo: #6fbf8f; --demo-soft: #1e3328;
       --shadow: 0 1px 3px rgba(0,0,0,0.35);
     }
@@ -84,6 +84,16 @@
   .chip.lead { background: var(--accent-soft); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); font-weight: 600; }
   .chip .note { color: var(--faint); }
   .chip.dim { opacity: 0.5; }
+  .minis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mini { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card); }
+  .mini .mimg { height: 54px; position: relative; }
+  .mini .mimg svg { width: 100%; height: 100%; display: block; }
+  .mini .mrec { position: absolute; top: 5px; left: 5px; background: #2f7d4f; color: #fff; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 999px; }
+  .mini b { display: block; font-size: 11.5px; padding: 6px 8px 2px; }
+  .mini span { display: block; font-size: 10.5px; color: var(--accent-text); font-weight: 600; padding: 0 8px 7px; }
+  .art .sky { fill: #dcecf3; } .art .stone { fill: #ddd6cb; } .art .card2 { fill: var(--card-2); }
+  .art .acc { fill: var(--accent); } .art .accS { fill: var(--accent-soft); }
+  @media (prefers-color-scheme: dark) { .art .sky { fill: #24333a; } .art .stone { fill: #33302a; } }
 
   .travelers { display: flex; flex-wrap: wrap; gap: 8px; }
   .tvr { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; font-size: 13.5px; }
@@ -128,33 +138,34 @@
     </div>
   </div>
 
-  <h2 class="section">Guided, context-aware choices</h2>
+  <h2 class="section">A companion that knows where you are</h2>
   <div class="split">
     <div class="copy">
-      <p>Most planners hand you a blank chat box. This one <strong>offers the next decision</strong> — and each choice narrows toward a concrete change.</p>
-      <p>The options aren't a fixed menu. What it offers <strong>shifts with who's travelling and the moment</strong> — the weather in that window, the time of day, how tired everyone is. Rain rolls in and the covered options move up; the kid's fading and the ambitious plans step back.</p>
-      <p>You can shape a whole day, or tap <strong>“what next here?”</strong> on any single stop.</p>
+      <p>Mid-trip, it already knows the <strong>state of your day</strong> — where you are, the time, the weather, who's along, and what you've already done.</p>
+      <p>So instead of a blank chat box, it answers the real question: <strong>what next?</strong> Pick a direction — eat, see something, chill, an adventure — and it opens a <strong>visual tree of real options</strong>, each a place or activity with a photo and why it fits right now. Tap one into your evening and it's added to the plan.</p>
+      <p>The full itinerary is one tap away in a sidebar — but the companion is the thing you actually talk to.</p>
     </div>
     <div class="demo-card" aria-hidden="true">
       <div class="ctxrow">
-        <span class="lbl">Right now</span>
-        <span class="pill on">☂ Showers</span>
-        <span class="pill">Afternoon</span>
-        <span class="pill on">Tired</span>
+        <span class="lbl">📍 Assagao</span><span class="pill">4:12 PM</span><span class="pill">☂ light rain</span><span class="pill">4 travelers</span>
       </div>
       <div class="body">
-        <div class="bubble">What kind of view spot?</div>
-        <div class="optbox">
-          <div class="trail">Day 3 › Visit › A good view</div>
-          <div class="why">Why these: showery, so the covered cafe leads; the cliff point's a between-showers dash.</div>
-          <span class="chip lead">Cafe with a good view</span>
-          <span class="chip dim">Sea-cliff sunset point <span class="note">· better if it clears</span></span>
+        <div class="bubble">The rain's easing — hungry, or up for something? Here's what's good right now.</div>
+        <div class="minis">
+          <div class="mini">
+            <div class="mimg"><svg class="art" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><rect class="sky" width="160" height="100"/><rect class="card2" y="64" width="160" height="36"/><rect class="acc" x="18" y="30" width="124" height="12" rx="3"/><rect class="card2" x="66" y="56" width="28" height="18" rx="3"/><ellipse class="accS" cx="80" cy="72" rx="20" ry="7"/></svg><span class="mrec">good now</span></div>
+            <b>Cafe Bodega</b><span>covered · bebinca</span>
+          </div>
+          <div class="mini">
+            <div class="mimg"><svg class="art" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><rect class="sky" width="160" height="100"/><rect class="acc" x="14" y="30" width="60" height="70"/><rect class="stone" x="86" y="24" width="60" height="76"/><rect class="card2" x="24" y="42" width="16" height="22" rx="2"/><rect class="card2" x="96" y="38" width="16" height="24" rx="2"/></svg></div>
+            <b>Fontainhas lanes</b><span>photogenic in rain</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <h2 class="section">The demo plans around</h2>
+  <h2 class="section">Who it's travelling with</h2>
   <div class="travelers">
     <div class="tvr"><b>Dhanjit</b> <span>32 · vegetarian · history</span></div>
     <div class="tvr"><b>Priya</b> <span>30 · photography · coffee</span></div>
@@ -163,7 +174,7 @@
   </div>
 
   <div class="foot-cta">
-    <a class="cta" href="/demo">Plan a trip in the demo →</a>
+    <a class="cta" href="/demo">Open the companion demo →</a>
   </div>
 
   <footer>

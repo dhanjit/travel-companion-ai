@@ -59,9 +59,10 @@ generic the options.
 | External factors | calendars, closures | Sunday market closed, festival road shut, sunset time |
 
 In the **real app** the model receives this context and _generates_ the
-question + options. In the **mockup** the branches are hardcoded but each
-question shows a short "why these" line, so the context-driven nature is
-visible even though it's simulated.
+question + options. In the **mockup** the branches are hardcoded, but the
+companion's reply (`mood.say`, e.g. "the rain actually helps here — the covered
+spots are calmer") plus each card's `note` and its "good right now" `rec` badge
+make the context-driven reasoning visible even though it's simulated.
 
 ## Interaction model
 
@@ -122,7 +123,8 @@ one event; nothing else changes.
   > — the same strict-mode rules `ITINERARY_SCHEMA` follows (CLAUDE.md invariant 1).
 
 - New wire event `{type:"options", node}` on the existing protocol. The client
-  renders the option box (same UI as the mockup's `.msg-opts`).
+  renders image-bearing option cards (same UI as the mockup's `.cards`/`.node`
+  visual tree → `.place` detail).
 - When the model calls `suggest_options`, the server emits `{type:"options"}`
   **and** must still push a synthetic `tool_result` (e.g. "options shown;
   awaiting the user's pick") and break out of the round loop — the Anthropic API
@@ -164,11 +166,12 @@ choices is new, and it's a leaf tool the model opts into.
 
 | | Mockup (`site/demo/index.html`) | Real app |
 |---|---|---|
-| Option sets | hardcoded `TREE` + leaf functions, **re-ranked/annotated by a simulated context** | model-generated via `suggest_options` |
-| "Why these" line | generated from the simulated `CTX` | generated from real context |
-| Context signals | simulated, **user-toggleable** (weather / time / energy) | live: profiles, weather, time, location |
-| Applying a change | mutate the JS itinerary object | `update_itinerary` tool |
-| Network | **none — stays standalone** | Claude API + signal providers |
+| Shape | companion-first: chat + a visual `mood → place` tree; itinerary in a drawer | same shape, model-driven |
+| Option sets | hardcoded `MOODS` tree of place/activity cards | model-generated via `suggest_options` |
+| Imagery | flat **SVG illustrations** per activity type (`ART`) | real photos of the place / dish / activity |
+| Context (location, time, weather, who) | **ambient** — shown in the header, baked into the copy (not toggles) | live: profiles, clock, weather API, geolocation |
+| Applying a choice | "Add to this evening" appends to the JS plan | `update_itinerary` tool |
+| Network | **none — stays standalone** | Claude API + signal + image providers |
 
 The mockup demonstrates the _interaction and the intent_; it must stay
 zero-dependency and zero-network (CLAUDE.md invariant 4). Don't wire real APIs
@@ -176,38 +179,42 @@ into the mockup — prototype those in the Next.js app.
 
 ## How the mockup demonstrates it today
 
-In `site/demo/index.html`:
+`site/demo/index.html` is **companion-first**: the trip is already underway
+(day 3, 4:12 PM, in Assagao, light rain, four travelers). There is no planning
+form — the companion just knows the state and answers "what next this evening?".
 
-- `CTX` — a simulated context (`weather` / `time` / `energy`), exposed as the
-  **"Right now"** toggle strip in the chat. Changing it re-ranks and re-annotates
-  the open question's options live — the visible stand-in for "the model chose
-  these because of the moment".
-- `scoreOption` / `optionNote` — order options and add notes ("better if it
-  clears", "ambitious right now") from `CTX`. Category options (that lead to
-  another question) stay put; strongly-mismatched leaves dim.
-- `TREE` — the node graph: `root` → `visit` → (`popular` / `view` / `offbeat`),
-  plus direct leaves. Each node's `why()` and `trail` render above the options.
-- `openQuestion` / `askNode(id)` / `pick(box, btn, opt)` — stream a question,
-  render options via `renderOptions`, handle a pick (drill to `next` or run a
-  leaf's `apply`), keep the trail visible, manage focus.
-- `day*()` leaf functions (`dayChill`, `dayDrive`, `dayTemples`, `dayForts`,
-  `dayMarkets`, `dayWaterfall`, `dayIsland`, `dayCafeView`, `dayCliffPoint`) —
-  each rewrites day 3 and returns the companion's explanation.
-- Two entry points: the **"Shape this day →"** button on the day-3 card
-  (`data-action="shape3"`), and **"what next here?"** on every stop
-  (`data-action="next"` → `whatNextHere` → `momentNode`), which builds a
-  context-aware question anchored to that stop and inserts a fitting stop.
+- **Ambient context** — location / time / weather / travelers sit in the header
+  as plain facts (not toggles). The companion's copy reasons from them ("the
+  rain actually helps here — the covered spots are calmer").
+- **`MOODS`** — the decision tree: four moods (`eat` / `see` / `chill` /
+  `adventure`), each with 2–3 **place cards**. A place carries an image
+  (`art` key), a one-line `note` tuned to the state ("covered · 25 min",
+  "kid course"), a `rec` flag ("good right now"), a `detail`, and a `special`
+  (the specialty dish/feature, with its own image).
+- **`ART`** — flat SVG illustrations keyed by type (`cafe`, `dish`, `temple`,
+  `ropewalk`, `trek`, `kayak`, …), themed via CSS vars so they follow dark mode.
+  These stand in for the real app's photos.
+- **`renderTree()`** — draws the current level from `sel = {moodId, placeId}`:
+  mood cards → place cards → a full place detail card (hero image + specialty +
+  "Add to this evening"). Chosen steps stay as clickable breadcrumb `crumb`s.
+- **`pickMood` / `pickPlace` / `addCurrent` / `goBack`** — each step posts to the
+  companion chat (chat reflects the tree) and, on add, appends to the plan.
+- **Itinerary drawer** — the full day (done stops ✓, a "now" marker, and added
+  evening stops) lives behind the header's **"Today's plan"** button, not on the
+  main surface.
 
-The narrowing chain the user asked for is live:
-`Visit things → Somewhere with a good view → Cafe with a good view`, and the
-choices visibly change when you flip the context toggles.
+The narrowing the user asked for is live and visual: pick a mood → see
+image cards of real options → open one to its photo + specialty → add it.
 
 ## Next steps
 
-- [x] Mockup: moment-level "what next here?" on individual stops (done).
-- [x] Mockup: choices that visibly shift with context (weather/time/energy).
-- [ ] Real app: implement `suggest_options` tool + `{type:"options"}` event;
-      port the mockup's option-box UI into a React component.
+- [x] Mockup: companion-first layout; itinerary demoted to a drawer.
+- [x] Mockup: a visual `mood → place` tree with per-activity imagery + specialty.
+- [x] Mockup: ambient context (location/time/weather/who) drives the copy.
+- [ ] Real app: implement `suggest_options` tool + `{type:"options"}` event
+      returning image-bearing option cards; port the tree UI into React.
+- [ ] Wire real imagery (a place-photo/provider lookup per option) — external
+      I/O, so it needs timeouts + fallback to an illustration.
 - [ ] Decide the _Open_ items above (signals/providers, provider seam,
       proactive offers, auto-narrow depth) — Dhanjit + Ganeshan.
 - [ ] A small eval set: given a context vector, does the generated option set

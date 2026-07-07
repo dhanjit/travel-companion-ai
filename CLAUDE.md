@@ -62,9 +62,10 @@ decision as a small set of choices that narrow toward a change, and the option
 set itself is model-generated from context (traveler interests, mood, time of
 day, weather, location). Read [docs/agentic-choices.md](docs/agentic-choices.md)
 before touching the decision-tree code or the chat route. The mockup already
-demonstrates the interaction (`TREE`/`askNode`/`pick` + the `CTX` context engine
-in `site/demo/index.html`); the real-app plan (a `suggest_options` tool +
-`{type:"options"}` event) is in that doc. Built by Dhanjit with Ganeshan — keep the doc current as the shared
+demonstrates the interaction (a companion-first UI with a visual `MOODS`
+mood→place image-card tree + an itinerary drawer in `site/demo/index.html`);
+the real-app plan (a `suggest_options` tool + `{type:"options"}` event) is in
+that doc. Built by Dhanjit with Ganeshan — keep the doc current as the shared
 source of truth.
 
 ### Invariants
